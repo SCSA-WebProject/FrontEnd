@@ -6,15 +6,20 @@ const HeaderWithBack = ({ title }) => {
 
     const navigate = useNavigate();
 
+    const handleBack = () => {
+        navigate(-1);
+    };
+
     return (
         <Container>
             <Header>
-                <BackButton onClick={() => navigate(-1)}><IoIosArrowBack size={24} /></BackButton>
+                <ButtonContainer onClick={handleBack}>
+                    <BackButton><IoIosArrowBack size={24} /></BackButton>
+                </ButtonContainer>
                 <Title>{title}</Title>
             </Header>
         </Container>
     );
-
 };
 
 const Container = styled.div`
@@ -32,6 +37,13 @@ const Header = styled.div`
     display: flex;
     align-items: center;
     justify-content: center;
+`;
+
+const ButtonContainer = styled.div`
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
 `;
 
 const BackButton = styled.div`
