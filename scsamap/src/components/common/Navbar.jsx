@@ -11,9 +11,8 @@ const Navbar = () => {
 
     const navItems = [
         { id: 1, name: '슥슐랭', path: '/ranking', icon: FaMapMarkerAlt },
-        { id: 2, name: '슥커뮤니티', path: '/play', icon: BiSearch },
-        { id: 3, name: '홈', path: '/main', icon: AiFillHome },
-        { id: 4, name: '마이페이지', path: '/mypage', icon: FaUser }
+        { id: 2, name: '홈', path: '/main', icon: AiFillHome },
+        { id: 3, name: '마이페이지', path: '/mypage', icon: FaUser }
     ];
 
     return (
@@ -59,12 +58,12 @@ const NavItem = styled.div`
 
 const IconWrapper = styled. div`
     position: relative;
-    color: ${props => props.isActive ? '#000' : '#666'};
+    color: ${props => props.isActive ? '#000' : '#ABABAB'};
 `;
 
 const NavText = styled.span`
     font-size: 10px;
-    color: ${props => props.isActive ? '#000' : '#666'};
+    color: ${props => props.isActive ? '#000' : '#ABABAB'};
 `;
 
 export default Navbar;

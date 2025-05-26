@@ -1,9 +1,9 @@
-const Index = () => {
+const MainPage = () => {
     return (
         <div>
-        메인페이지
+            
         </div>
     );
 };
 
-export default Index;
+export default MainPage;
