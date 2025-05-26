@@ -6,6 +6,11 @@ import { useNavigate } from "react-router-dom";
 
 const LoginPage = () => {
     const navigate = useNavigate();
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        navigate('/main');
+    };
+
     return (
         <Container>
 
@@ -17,10 +22,10 @@ const LoginPage = () => {
             </LogoContainer>
 
             {/* 로그인 폼 */}
-            <LoginForm>
+            <LoginForm onSubmit={handleSubmit}>
                 <Input placeholder="아이디" />
                 <Input placeholder="비밀번호" type="password" />
-                <Button text="로그인" width="100%" onClick={() => navigate('/main')} style={{ marginTop: '16px' }} />
+                <Button text="로그인" width="100%" style={{ marginTop: '16px' }} />
             </LoginForm>
             <SignUpText onClick={() => navigate('/signup')}>아직 회원이 아니신가요?</SignUpText>
 

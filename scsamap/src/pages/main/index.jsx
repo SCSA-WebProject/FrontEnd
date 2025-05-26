@@ -43,7 +43,7 @@ const MainPage = () => {
             <SectionWrapper>
                 <SectionTitle>
                     <BlueText>최근</BlueText>
-                    <BlackText> 동기들이 등록한 맛집</BlackText>
+                    <BlackText> 등록된 맛집</BlackText>
                 </SectionTitle>
                 <CardList>
                     {placeList.slice(0, 5).map((place, idx) => (

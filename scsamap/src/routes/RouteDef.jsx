@@ -1,5 +1,6 @@
-import Main from '../pages/Main';
+import Main from '../pages/main/index.jsx';
 import LoginPage from '../pages/login/index.jsx';
+import RegisterPage from '../pages/register/index.jsx';
 import SignUpPage from '../pages/signup/index.jsx';
 
 const MainScreens = {
@@ -14,6 +15,10 @@ const MainScreens = {
     SignUpPage: {
         path: '/signup',
         element: <SignUpPage />,
+    },
+    PlaceList: {
+        path: '/register',
+        element: <RegisterPage />,
     },
 };
 
