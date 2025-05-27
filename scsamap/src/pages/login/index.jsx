@@ -3,6 +3,8 @@ import scmapIcon from "../../assets/common/scmapIcon.png";
 import Button from '../../components/common/Button';
 import Input from "../../components/common/Input";
 import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import axios from "axios";
 
 const LoginPage = () => {
     const navigate = useNavigate();
@@ -10,6 +12,16 @@ const LoginPage = () => {
         e.preventDefault();
         navigate('/main');
     };
+
+    useEffect(() => {
+        axios.get("http://localhost:8080/board/list")
+            .then((res) => {
+                console.log("연동 성공", res);
+            })
+            .catch((err) => {
+                console.log("연동 실패", err);
+            })
+    }, []);
 
     return (
         <Container>
