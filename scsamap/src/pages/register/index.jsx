@@ -2,14 +2,22 @@ import styled from "styled-components";
 import Button from "../../components/common/Button";
 import HeaderWithBack from "../../components/common/HeaderWithBack";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 const RegisterPage = () => {
+    const [name, setName] = useState("");
+    const [region, setRegion] = useState("");
+    const [category, setCategory] = useState("");
+    const [price, setPrice] = useState("");
+    const [comment, setComment] = useState("");
 
     const navigate = useNavigate();
     const handleRegister = () => {
         navigate("/main")
     };
     
+    // 하나라도 빈 값이 있으면 false
+    const isFormFilled = name && price && comment;
 
     return (
         <Container>
@@ -17,19 +25,19 @@ const RegisterPage = () => {
             <Form>
                 <Label>상호명</Label>
                 <Row>
-                    <Input placeholder="예시) 넘버원 양꼬치 한남점" />
+                    <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="예시) 넘버원 양꼬치 한남점" />
                 </Row>
                 <SubText>체인점일 경우 지점도 함께 작성해주세요.</SubText>
 
                 <Label>지역 & 분류</Label>
                 <Row>
-                    <Select>
+                    <Select value={region} onChange={(e) => setRegion(e.target.value)}>
                         <option>경기</option>
                         <option>서울</option>
                         <option>부산</option>
                         {/* 지역 추가 */}
                     </Select>
-                    <Select>
+                    <Select value={category} onChange={(e) => setCategory(e.target.value)}>
                         <option>중식</option>
                         <option>한식</option>
                         <option>일식</option>
@@ -39,16 +47,16 @@ const RegisterPage = () => {
 
                 <Label>가격대 (숫자만 표기)</Label>
                 <Row>
-                    <InputSmall placeholder="예시) 1" />
+                    <InputSmall value={price} onChange={(e) => setPrice(e.target.value)} placeholder="예시) 1" />
                     <Unit>만원 대</Unit>
                 </Row>
 
                 <Label>한줄평</Label>
                 <Row>
-                    <Input placeholder="예시) 여기는 옥수수전이 미쳤어요" />
+                    <Input value={comment} onChange={(e) => setComment(e.target.value)} placeholder="예시) 여기는 옥수수전이 미쳤어요" />
                 </Row>
             
-                <Button text="등록" width="100%" disabled={false} onClick={handleRegister} style={{ marginTop: "32px" }} />
+                <Button text="등록" width="100%" disabled={!isFormFilled} onClick={handleRegister} style={{ marginTop: "32px" }} />
             </Form>
         </Container>
     );

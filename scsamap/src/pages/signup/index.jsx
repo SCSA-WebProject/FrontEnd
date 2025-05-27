@@ -5,6 +5,7 @@ import Input from "../../components/common/Input";
 import Button from "../../components/common/Button";
 import { IoIosArrowDown } from "react-icons/io";
 import { useState } from "react";
+import axios from "axios";
 
 const SignUpPage = () => {
 
@@ -20,16 +21,47 @@ const SignUpPage = () => {
     const isFormFilled = id && password && name && phone && company;
 
     // 회원가입 버튼 클릭 시 메인 페이지로 이동
-    const handleSignUp = () => {
-        if (isFormFilled) {
+    const handleSignUp = async (e) => {
+        e.preventDefault();
+        if (!isFormFilled) return;
+    
+        const data = {
+            id,
+            password,
+            name,
+            phone,
+            classNum: 1, // 실제 입력값으로 대체
+            companyCode: 200, // 실제 입력값으로 대체 (100 : DX, 200 : DS, 300 : SDS)
+            companyName: "dx",
+        };
+    
+        try {
+            const response = await axios.post(
+                "http://localhost:8080/signup",
+                data,
+                {
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    withCredentials: true,
+                }
+            );
+            console.log(response);
+            alert("회원가입이 완료되었습니다!");
+
+            sessionStorage.setItem("user", JSON.stringify(data));
+            localStorage.setItem("user", JSON.stringify(data));
             navigate("/main");
+            
+        } catch (error) {
+            alert("회원가입 실패: " + (error.response?.data?.error || error.message));
         }
     };
 
     return (
         <Container>
             <HeaderWithBack title="회원가입" />
-            <Form>
+            <Form onSubmit={handleSignUp}>
                 <Label>아이디</Label>
                 <Row>
                     <Input placeholder="아이디를 입력해주세요." style={{flex: 1}} value={id} onChange={(e) => setId(e.target.value)} />
@@ -50,7 +82,7 @@ const SignUpPage = () => {
                     </StyledSelect>
                     <ArrowIcon />
                 </SelectWrapper>
-                <Button text="회원가입" width="100%" disabled={!isFormFilled} onClick={handleSignUp} style={{ marginTop: "32px" }} />
+                <Button text="회원가입" type="submit" width="100%" disabled={!isFormFilled} style={{ marginTop: "32px" }} />
             </Form>
         </Container>
     );

@@ -6,14 +6,22 @@ import PlaceImg from "../../assets/common/restaurantPic.jpg";
 import { FaUtensils } from "react-icons/fa";
 import { BiSearch } from "react-icons/bi";
 import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import axios from "axios";
 
-const placeList = [
-    { image: PlaceImg, category: "한식", name: "샤브온당", likes: 3, path: "/place/1" },
-    { image: PlaceImg, category: "일식", name: "긴자료코 신사점", likes: 5, path: "/place/2" },
-    { image: PlaceImg, category: "중식", name: "매운향솥", likes: 3, path: "/place/3" },
-    { image: PlaceImg, category: "중식", name: "넘버원 양꼬치 한남점", likes: 12, path: "/place/4" },
-    { image: PlaceImg, category: "일식", name: "가츠시", likes: 9, path: "/place/5" },
-];
+// const [recentBoards, setRecentBoards] = useState([]);
+// const [popularBoards, setPopularBoards] = useState([]);
+
+// useEffect(() => {
+//     axios.get("http://localhost:8080/main", { withCredentials: true })
+//         .then(res => {
+//             setRecentBoards(res.data.recentBoards || []);
+//             setPopularBoards(res.data.popularBoards || []);
+//         })
+//         .catch(err => {
+//             console.error("메인 데이터 불러오기 실패:", err);
+//         });
+// }, []);
 
 const MainPage = () => {
 
@@ -46,9 +54,16 @@ const MainPage = () => {
                     <BlackText> 등록된 맛집</BlackText>
                 </SectionTitle>
                 <CardList>
-                    {placeList.slice(0, 5).map((place, idx) => (
-                        <PlaceCard key={idx} {...place} path={place.path} />
-                    ))}
+                {recentBoards.map((board, idx) => (
+                    <PlaceCard
+                        key={board.id}
+                        image={PlaceImg} // 실제 이미지 필드가 있다면 board.image로 교체
+                        category={board.category}
+                        name={board.title}
+                        likes={board.likes || 0} // likes 필드가 있으면 사용, 없으면 0
+                        path={`/place/${board.id}`}
+                    />
+                ))}
                 </CardList>
             </SectionWrapper>
 
