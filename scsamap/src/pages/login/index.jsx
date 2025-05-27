@@ -14,7 +14,7 @@ const LoginPage = () => {
     };
 
     useEffect(() => {
-        axios.get("http://localhost:8080/board/list")
+        axios.get("http://localhost:8080/login")
             .then((res) => {
                 console.log("연동 성공", res);
             })

@@ -9,6 +9,7 @@ const RegisterPage = () => {
     const handleRegister = () => {
         navigate("/main")
     };
+    
 
     return (
         <Container>
@@ -73,7 +74,6 @@ const Label = styled.label`
     font-size: 15px;
     font-weight: 500;
     margin-top: 10px;
-    margin-bottom: 8px;
     color: #0C4DA2;
 `;
 
