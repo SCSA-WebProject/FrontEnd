@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import scmapIcon from "../../assets/common/scmapIcon.png";
+import scchelinIcon from "../../assets/common/cookIcon.png";
 import Button from '../../components/common/Button';
 import Input from "../../components/common/Input";
 import { useNavigate } from "react-router-dom";
@@ -47,8 +47,8 @@ const LoginPage = () => {
         <Container>
             {/* 프로젝트 이름 + 로고 이미지 */}
             <LogoContainer>
-                <Logo>슥-맵</Logo>
-                <LogoImage src={scmapIcon} alt="logo" />
+                <Logo>슥슐랭 가이드</Logo>
+                <LogoImage src={scchelinIcon} alt="logo" />
                 <LogoDescription>슥사생 픽 맛집과 후기를 한 눈에!</LogoDescription>
             </LogoContainer>
 
@@ -84,7 +84,7 @@ const Container = styled.div`
 `;
 
 const LogoContainer = styled.div`
-    margin-top: 80px;
+    margin-top: 50px;
     width: 100%;
     display: flex;
     flex-direction: column;
@@ -97,10 +97,12 @@ const Logo = styled.div`
     font-size: 50px;
     font-weight: 600;
     color: #0C4DA2;
+    margin-bottom: 10px;
 `;
 
 const LogoImage = styled.img`
-    width: 40%;
+    width: 30%;
+    margin-bottom: 10px;
 `;
 
 const LogoDescription = styled.div`

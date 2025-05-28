@@ -137,7 +137,7 @@ const List = styled.div`
 const PlaceCard = styled.div`
     background: #fff;
     border-radius: 16px;
-    box-shadow: 0 2px 8px #eee;
+    border: 1px solid #ABABAB;
     margin-bottom: 24px;
     padding: 16px;
     cursor: pointer;
@@ -164,14 +164,14 @@ const Price = styled.div`
 const FixedMapButton = styled.button`
     position: fixed;
     left: 0;
-    bottom: 0;
-    width: 15%;
+    bottom: 20px;
+    width: 10%;
     margin: 0 auto;
     background:rgb(255, 255, 255);
     color: #0C4DA2;
     border: 1px solid #0C4DA2;
     border-radius: 30px;
-    font-size: 15px;
+    font-size: 12px;
     font-weight: bold;
     z-index: 100;
     cursor: pointer;
