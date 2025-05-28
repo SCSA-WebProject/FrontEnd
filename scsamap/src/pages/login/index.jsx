@@ -33,7 +33,6 @@ const LoginPage = () => {
             console.log("로그인 성공:", response.data);
 
             // 예: 응답 데이터 저장 또는 처리
-            localStorage.setItem("user", JSON.stringify(response.data.user));
             sessionStorage.setItem("user", JSON.stringify(response.data.user));
             
             // 메인 페이지로 이동
