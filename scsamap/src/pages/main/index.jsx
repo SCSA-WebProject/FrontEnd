@@ -9,21 +9,24 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
 
-// const [recentBoards, setRecentBoards] = useState([]);
-// const [popularBoards, setPopularBoards] = useState([]);
-
-// useEffect(() => {
-//     axios.get("http://localhost:8080/main", { withCredentials: true })
-//         .then(res => {
-//             setRecentBoards(res.data.recentBoards || []);
-//             setPopularBoards(res.data.popularBoards || []);
-//         })
-//         .catch(err => {
-//             console.error("메인 데이터 불러오기 실패:", err);
-//         });
-// }, []);
-
 const MainPage = () => {
+
+    const [recentBoards, setRecentBoards] = useState([]);
+    const [popularBoards, setPopularBoards] = useState([]);
+
+    useEffect(() => {
+        axios.get("http://localhost:8080/main", { withCredentials: true })
+            .then(res => {
+                setRecentBoards(res.data.recentBoards || []);
+                setPopularBoards(res.data.popularBoards || []);
+            })
+            .catch(err => {
+                console.error("메인 데이터 불러오기 실패:", err);
+            });
+    }, []);
+
+    console.log(recentBoards);
+    console.log(popularBoards);
 
     const navigate = useNavigate();
     return (
@@ -74,8 +77,15 @@ const MainPage = () => {
                     <BlackText> 맛집</BlackText>
                 </SectionTitle>
                 <CardList>
-                    {placeList.slice(0, 5).map((place, idx) => (
-                        <PlaceCard key={idx} {...place} path={place.path} />
+                    {popularBoards.map((board, idx) => (
+                        <PlaceCard
+                            key={board.id}
+                            image={PlaceImg} // 실제 이미지 필드가 있다면 board.image로 교체
+                            category={board.category}
+                            name={board.title}
+                            likes={board.likes || 0} // likes 필드가 있으면 사용, 없으면 0
+                            path={`/place/${board.id}`}
+                        />
                     ))}
                 </CardList>
             </SectionWrapper>
