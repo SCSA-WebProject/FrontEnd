@@ -83,7 +83,7 @@ const MainPage = () => {
                             image={PlaceImg} // 실제 이미지 필드가 있다면 board.image로 교체
                             category={board.category}
                             name={board.title}
-                            likes={board.likes || 0} // likes 필드가 있으면 사용, 없으면 0
+                            likes={board.likeCount || 0} // likes 필드가 있으면 사용, 없으면 0
                             path={`/place/${board.id}`}
                         />
                     ))}

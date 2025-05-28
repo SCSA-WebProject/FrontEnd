@@ -1,7 +1,6 @@
 import styled from "styled-components";
 import { useLocation, useNavigate } from "react-router-dom";
 import { FaMapMarkerAlt, FaUser } from "react-icons/fa";
-import { BiSearch } from "react-icons/bi";
 import { AiFillHome } from "react-icons/ai";
 
 const Navbar = () => {
@@ -10,7 +9,7 @@ const Navbar = () => {
     const onPage = (path) => location.pathname === path;
 
     const navItems = [
-        { id: 1, name: '슥슐랭', path: '/ranking', icon: FaMapMarkerAlt },
+        { id: 1, name: '슥슐랭', path: '/placelist', icon: FaMapMarkerAlt },
         { id: 2, name: '홈', path: '/main', icon: AiFillHome },
         { id: 3, name: '마이페이지', path: '/mypage', icon: FaUser }
     ];

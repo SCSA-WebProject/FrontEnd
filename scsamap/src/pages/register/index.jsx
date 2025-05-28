@@ -3,29 +3,66 @@ import Button from "../../components/common/Button";
 import HeaderWithBack from "../../components/common/HeaderWithBack";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import axios from "axios";
 
 const RegisterPage = () => {
-    const [name, setName] = useState("");
+    const [title, setTitle] = useState("");
     const [region, setRegion] = useState("");
     const [category, setCategory] = useState("");
     const [price, setPrice] = useState("");
-    const [comment, setComment] = useState("");
+    const [content, setContent] = useState("");
+    const [address, setAddress] = useState("서울특별시 용산구 한남동");
+    const [attach, setAttach] = useState(null)
 
     const navigate = useNavigate();
-    const handleRegister = () => {
-        navigate("/main")
-    };
     
+    const handleRegister = async (e) => {
+        e.preventDefault();
+        
+        if (!isFormFilled) return;
+
+        const formData = new FormData();
+        formData.append("title", title);
+        formData.append("region", region);
+        formData.append("category", category);
+        formData.append("price", price);
+        formData.append("content", content);
+        formData.append("address", address);
+
+        if (attach) formData.append("attach", attach);
+
+        try {
+            await axios.post("http://localhost:8080/board/write", formData, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
+                withCredentials: true,
+            });
+            console.log(formData)
+            alert("등록이 완료되었습니다!");
+            navigate("/main");
+        } catch (err) {
+            alert("등록 실패: " + (err.response?.data?.error || err.message));
+        }
+    };
+
+
     // 하나라도 빈 값이 있으면 false
-    const isFormFilled = name && price && comment;
+    const isFormFilled = title && price && content;
 
     return (
         <Container>
             <HeaderWithBack title="맛집 등록하기" />
-            <Form>
+            <Form onSubmit={handleRegister}>
+                <Label>사진 첨부</Label>
+                <input
+                    type="file"
+                    accept="image/*"
+                    onChange={e => setAttach(e.target.files[0])}
+                />
                 <Label>상호명</Label>
                 <Row>
-                    <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="예시) 넘버원 양꼬치 한남점" />
+                    <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="예시) 넘버원 양꼬치 한남점" />
                 </Row>
                 <SubText>체인점일 경우 지점도 함께 작성해주세요.</SubText>
 
@@ -53,10 +90,10 @@ const RegisterPage = () => {
 
                 <Label>한줄평</Label>
                 <Row>
-                    <Input value={comment} onChange={(e) => setComment(e.target.value)} placeholder="예시) 여기는 옥수수전이 미쳤어요" />
+                    <Input value={content} onChange={(e) => setContent(e.target.value)} placeholder="예시) 여기는 옥수수전이 미쳤어요" />
                 </Row>
             
-                <Button text="등록" width="100%" disabled={!isFormFilled} onClick={handleRegister} style={{ marginTop: "32px" }} />
+                <Button text="등록" type="submit" width="100%" disabled={!isFormFilled} style={{ marginTop: "32px" }} />
             </Form>
         </Container>
     );
@@ -71,7 +108,7 @@ const Container = styled.div`
     min-height: 100vh;
 `;
 
-const Form = styled.div`
+const Form = styled.form`
     display: flex;
     flex-direction: column;
     gap: 10px;
