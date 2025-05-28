@@ -53,6 +53,7 @@ const Category = styled.div`
     padding: 2px 10px;
     margin-top: 8px;
     font-weight: 500;
+    margin-bottom: 4px;
 `;
 
 const PlaceName = styled.div`
