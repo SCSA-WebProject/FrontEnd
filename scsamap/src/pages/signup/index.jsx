@@ -58,6 +58,26 @@ const SignUpPage = () => {
         }
     };
 
+    const handleCheckId = async () => {
+        if (!id) return; // 혹시 모를 예외 처리
+    
+        try {
+            const res = await axios.get("http://localhost:8080/checkId", {
+                params: { id }
+            });
+            if (res.data === "duplicate") {
+                alert("이미 사용 중인 아이디입니다.");
+            } else if (res.data === "available") {
+                alert("사용 가능한 아이디입니다!");
+            } else {
+                alert("서버 응답 오류");
+            }
+        } catch (err) {
+            alert("중복 확인 중 오류가 발생했습니다.");
+            console.error(err);
+        }
+    };
+
     return (
         <Container>
             <HeaderWithBack title="회원가입" />
@@ -65,7 +85,7 @@ const SignUpPage = () => {
                 <Label>아이디</Label>
                 <Row>
                     <Input placeholder="아이디를 입력해주세요." style={{flex: 1}} value={id} onChange={(e) => setId(e.target.value)} />
-                    <CheckButton type="button">중복확인</CheckButton>
+                    <CheckButton type="button" disabled={!id} onClick={handleCheckId}>중복확인</CheckButton>
                 </Row>
                 <Label>비밀번호</Label>
                 <Input placeholder="비밀번호를 입력해주세요." type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
@@ -144,15 +164,16 @@ const ArrowIcon = styled(IoIosArrowDown)`
 `;
 
 const CheckButton = styled.button`
-    background: #0C4DA2;
+    background: ${({ disabled }) => (disabled ? "#DEDEDE" : "#0C4DA2")};
     color: #fff;
     border: none;
     border-radius: 10px;
     font-size: 16px;
     padding: 0 18px;
     height: 56px;
-    cursor: pointer;
+    cursor: ${({ disabled }) => (disabled ? "not-allowed" : "pointer")};
     white-space: nowrap;
+    transition: background 0.2s;
 `;
 
 export default SignUpPage;
