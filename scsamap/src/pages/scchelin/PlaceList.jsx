@@ -77,7 +77,7 @@ const PlaceListPage = () => {
                 </PlaceCard>
             ))}
         </List>
-        <FixedMapButton>지도보기</FixedMapButton>
+        <FixedMapButton onClick={() => navigate('/placemap')}>지도보기</FixedMapButton>
         </Container>
     );
 };

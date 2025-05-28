@@ -4,6 +4,7 @@ import RegisterPage from '../pages/register/index.jsx';
 import SignUpPage from '../pages/signup/index.jsx';
 import PlaceListPage from '../pages/scchelin/PlaceList.jsx';
 import PlaceDetailPage from '../pages/scchelin/PlaceDetail.jsx';
+import PlaceMapPage from '../pages/scchelin/PlaceMap.jsx';
 
 const MainScreens = {
     LoginPage: {
@@ -30,6 +31,10 @@ const MainScreens = {
         path: '/place/:placeId',
         element: <PlaceDetailPage />,
     },
+    PlaceMapPage: {
+        path: '/placemap',
+        element: <PlaceMapPage />,
+    }
 };
 
 export const AppRouteDef = {
