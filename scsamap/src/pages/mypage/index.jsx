@@ -79,11 +79,12 @@ const RecentRegisterTitle = styled.div`
 `;
 
 const BoardCard = styled.div`
-border: 1px solid #eee;
+    border: 1px solid #eee;
     border-radius: 12px;    
     padding: 16px;
     margin-bottom: 16px;
     background: #fff;
+    cursor: pointer;
 `;
 
 const BoardTitle = styled.div`
