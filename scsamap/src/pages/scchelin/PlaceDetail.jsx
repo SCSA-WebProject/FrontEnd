@@ -1,90 +1,151 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import { useNavigate } from "react-router-dom";
-import PlaceImg from "../../assets/common/restaurantPic.jpg"; // 샘플 이미지
+import { useNavigate, useParams } from "react-router-dom";
+import PlaceImg from "../../assets/common/restaurantPic.jpg";
 import HeaderWithBack from "../../components/common/HeaderWithBack";
-
-const placeData = {
-    1: {
-        id: 1,
-        writer: "김혜준",
-        company: "DX",
-        name: "넘버원 양꼬치",
-        likes: 8,
-        reviewCount: 3,
-        category: "중식",
-        location: "서울",
-        description: "한남동에서 제일 맛있는 양꼬치 맛집",
-        distance: "한남역에서 680m",
-        address: "서울특별시 용산구 한남동 79-3",
-        priceRange: "요리 1만원 ~ 3만원",
-        openHours: "오늘(목) 16:00~03:00",
-        menu: [
-        { name: "넘버원 양꼬치", price: "16,000원" },
-        { name: "넘버원 양갈비", price: "23,000원" },
-        ],
-        image: PlaceImg,
-    },
-    2: {
-        id: 2,
-        writer: "김혜준",
-        company: "DX",
-        name: "가츠시",
-        likes: 9,
-        reviewCount: 2,
-        category: "일식",
-        location: "서울",
-        description: "서울에서 인기 많은 일식집",
-        distance: "강남역에서 200m",
-        address: "서울특별시 강남구 강남대로 123",
-        priceRange: "요리 2만원 ~ 4만원",
-        openHours: "오늘(목) 11:00~22:00",
-        menu: [
-        { name: "가츠동", price: "12,000원" },
-        { name: "사케동", price: "15,000원" },
-        ],
-        image: PlaceImg,
-    },
-};
+import axios from "axios";
+import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
 
 const PlaceDetailPage = () => {
-    // const { placeId } = useParams();
-    const placeId = 1;
+    const { id } = useParams();
     const navigate = useNavigate();
-    const place = placeData[placeId];
+    const [place, setPlace] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [marker, setMarker] = useState(null);
+    const [map, setMap] = useState(null);
+    const IMG_BASE_PATH = "http://localhost:8080/img";
 
-    if (!place) return <div>존재하지 않는 가게입니다.</div>;
+    const mapStyles = {
+        height: "300px",
+        width: "100%"
+    };
+
+    const defaultCenter = {
+        lat: 37.54813240071675,
+        lng: 127.07340271976555
+    };
+
+    useEffect(() => {
+        const fetchPlaceDetail = async () => {
+            if (!id) {
+                setLoading(false);
+                return;
+            }
+
+            try {
+                const response = await axios.get(`http://localhost:8080/board/detail`, {
+                    params: { id: id },
+                    withCredentials: true
+                });
+                if (response.data.success) {
+                    setPlace(response.data.board);
+                    // 주소가 있으면 지도 마커 설정
+                    if (response.data.board.address && window.google) {
+                        const geocoder = new window.google.maps.Geocoder();
+                        geocoder.geocode({ 
+                            address: response.data.board.address,
+                            region: 'kr'
+                        }, (results, status) => {
+                            if (status === 'OK' && results && results.length > 0) {
+                                const location = results[0].geometry.location;
+                                setMarker({
+                                    position: {
+                                        lat: location.lat(),
+                                        lng: location.lng()
+                                    },
+                                    title: response.data.board.title
+                                });
+                            }
+                        });
+                    }
+                }
+            } catch (error) {
+                console.error("상세 정보 불러오기 실패:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchPlaceDetail();
+    }, [id]);
+
+    if (loading) return <div>로딩중...</div>;
+    if (!id || !place) return <div>존재하지 않는 가게입니다.</div>;
 
     return (
         <Container>
-            <HeaderWithBack title={place.name} />
+            <HeaderWithBack title={place.title} />
             <TopImageBox>
-                <TopImage src={place.image} alt={place.name} />
+                <TopImage 
+                    src={place.boardFile?.filePath ? IMG_BASE_PATH + place.boardFile.filePath + "/" + place.boardFile.systemName : PlaceImg} 
+                    alt={place.title} 
+                />
                 <ImageDots>
-                    {[...Array(7)].map((_, i) => (
-                        <Dot key={i} active={i === 0} />
+                    {[...Array(1)].map((_, i) => (
+                        <Dot key={i} $active={true} />
                     ))}
                 </ImageDots>
             </TopImageBox>
             <Content>
                 <SubInfo>
-                    {place.location} | {place.category}
+                    {place.region} | {place.category}
                 </SubInfo>
                 <TitleRow>
-                    <Title>{place.name}</Title>
+                    <Title>{place.title}</Title>
                 </TitleRow>
                 <WriterRow>
-                    <Writer>작성자 | {place.company} {place.writer}</Writer>
+                    <Writer>작성자 | {place.userId}</Writer>
                 </WriterRow>
 
                 <Like>
-                    <span role="img" aria-label="thumbs up">👍</span> {place.likes}
+                    <span role="img" aria-label="thumbs up">👍</span> {place.likeCount}
                 </Like>
                 <InfoRow>
                     <InfoIcon>💰</InfoIcon>
-                    <span>{place.priceRange}</span>
+                    <span>평균 가격대 {place.price?.toLocaleString()}만원</span>
                 </InfoRow>
-                <Desc>{place.description}</Desc>
+                <Desc>{place.content}</Desc>
+
+                {place.address && (
+                    <MapContainer>
+                        <MapTitle>위치</MapTitle>
+                        {!window.google && (
+                            <LoadScript 
+                                googleMapsApiKey="AIzaSyDYXffkmjbxrESgfErWK0UZ7FshBLinnI4"
+                            >
+                                <GoogleMap
+                                    mapContainerStyle={mapStyles}
+                                    zoom={15}
+                                    center={marker?.position || defaultCenter}
+                                    onLoad={setMap}
+                                >
+                                    {marker && (
+                                        <Marker
+                                            position={marker.position}
+                                            title={marker.title}
+                                        />
+                                    )}
+                                </GoogleMap>
+                            </LoadScript>
+                        )}
+                        {window.google && (
+                            <GoogleMap
+                                mapContainerStyle={mapStyles}
+                                zoom={15}
+                                center={marker?.position || defaultCenter}
+                                onLoad={setMap}
+                            >
+                                {marker && (
+                                    <Marker
+                                        position={marker.position}
+                                        title={marker.title}
+                                    />
+                                )}
+                            </GoogleMap>
+                        )}
+                        <AddressText>{place.address}</AddressText>
+                    </MapContainer>
+                )}
             </Content>
         </Container>
     );
@@ -122,7 +183,7 @@ const Dot = styled.div`
     width: 7px;
     height: 7px;
     border-radius: 50%;
-    background: ${(props) => (props.active ? "#fff" : "#bbb")};
+    background: ${(props) => (props.$active ? "#fff" : "#bbb")};
     opacity: 0.8;
 `;
 const Content = styled.div`
@@ -175,4 +236,24 @@ const InfoRow = styled.div`
 `;
 const InfoIcon = styled.span`
     font-size: 18px;
+`;
+
+const MapContainer = styled.div`
+    margin-top: 24px;
+    border: 1px solid #eee;
+    border-radius: 12px;
+    overflow: hidden;
+`;
+
+const MapTitle = styled.div`
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 12px;
+`;
+
+const AddressText = styled.div`
+    padding: 12px;
+    font-size: 14px;
+    color: #666;
+    background: #f8f8f8;
 `;
