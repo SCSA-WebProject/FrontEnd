@@ -8,27 +8,6 @@ import axios from "axios";
 const categories = ["전체", "한식", "중식", "일식", "양식", "아시안", "술집"];
 const filters = ["좋아요 순", "최근 등록 순", "가격 높은 순", "가격 낮은 순"];
 
-const placeList = [
-    {
-        id: 1,
-        name: "길이식당 건대점",
-        likes: 7,
-        location: "서울",
-        category: "중식",
-        price: 30000,
-        image: PlaceImg, // 샘플 이미지
-    },
-    {
-        id: 2,
-        name: "가츠시",
-        likes: 9,
-        location: "서울",
-        category: "일식",
-        price: 30000,
-        image: PlaceImg, // 샘플 이미지
-    },
-];
-
 const PlaceListPage = () => {
     const [selectedCategory, setSelectedCategory] = useState("전체");
     const [selectedFilter, setSelectedFilter] = useState("내 주변");
