@@ -64,7 +64,7 @@ const ModalTitle = styled.div`
 `;
 
 const ModalContent = styled.div`
-    font-size: 1.25rem;
+    font-size: 1rem;
     color: #444;
     margin-bottom: 40px;
 `;

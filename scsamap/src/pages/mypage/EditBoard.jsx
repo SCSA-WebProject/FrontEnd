@@ -3,6 +3,7 @@ import HeaderWithBack from "../../components/common/HeaderWithBack";
 import { useNavigate, useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import axios from "axios";
+import Modal from "../../components/common/Modal";
 
 const PlaceEditPage = () => {
     const { id } = useParams();
@@ -14,8 +15,8 @@ const PlaceEditPage = () => {
     const [address, setAddress] = useState("");
     const [attach, setAttach] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [filePath, setFilePath] = useState("");
     const [systemName, setSystemName] = useState("");
+    const [showModal, setShowModal] = useState(false);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -42,7 +43,6 @@ const PlaceEditPage = () => {
             setContent(board.content || "");
             setAddress(board.address || "");
             setLoading(false);
-            setFilePath(board.boardFile?.filePath || "");
             setSystemName(board.boardFile?.systemName || "");
         })
         .catch(() => setLoading(false));
@@ -73,11 +73,15 @@ const PlaceEditPage = () => {
                 headers: { "Content-Type": "multipart/form-data" },
                 withCredentials: true,
             });
-            alert("수정이 완료되었습니다!");
-            navigate(-1);
+            setShowModal(true);
         } catch (err) {
             alert("수정 실패: " + (err.response?.data?.error || err.message));
         }
+    };
+
+    const handleModalConfirm = () => {
+        setShowModal(false);
+        navigate(-1);
     };
 
     const isFormFilled = title && price && content && address;
@@ -87,6 +91,16 @@ const PlaceEditPage = () => {
     return (
         <Container>
             <HeaderWithBack title="정보 수정" />
+            {showModal && (
+                <Modal
+                    title="알림"
+                    content="수정이 완료되었습니다!"
+                    item1Label="확인"
+                    item2Label=""
+                    onItem1Click={handleModalConfirm}
+                    onItem2Click={() => {}}
+                />
+            )}
             <Form onSubmit={handleEdit}>
                 <Label>사진 첨부</Label>
                 <input
