@@ -4,6 +4,7 @@ import HeaderWithBack from "../../components/common/HeaderWithBack";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import axios from "axios";
+import Modal from "../../components/common/Modal";
 
 const RegisterPage = () => {
     const [title, setTitle] = useState("");
@@ -13,6 +14,8 @@ const RegisterPage = () => {
     const [content, setContent] = useState("");
     const [address, setAddress] = useState("");
     const [attach, setAttach] = useState(null)
+
+    const [showModal, setShowModal] = useState(false);
 
     const navigate = useNavigate();
     
@@ -33,6 +36,11 @@ const RegisterPage = () => {
                 setAddress(data.address);
             }
         }).open();
+    };
+
+    const handleModalConfirm = () => {
+        setShowModal(false);
+        navigate("/main");
     };
 
     const handleRegister = async (e) => {
@@ -57,9 +65,7 @@ const RegisterPage = () => {
                 },
                 withCredentials: true,
             });
-            console.log(formData)
-            alert("등록이 완료되었습니다!");
-            navigate("/main");
+            setShowModal(true);
         } catch (err) {
             alert("등록 실패: " + (err.response?.data?.error || err.message));
         }
@@ -139,6 +145,16 @@ const RegisterPage = () => {
             
                 <Button text="등록" type="submit" width="100%" disabled={!isFormFilled} style={{ marginTop: "32px" }} />
             </Form>
+            {showModal && (
+                <Modal
+                    title="알림"
+                    content="등록이 완료되었습니다!"
+                    item1Label="확인"
+                    item2Label=""
+                    onItem1Click={handleModalConfirm}
+                    onItem2Click={() => {}}
+                />
+            )}
         </Container>
     );
 };

@@ -14,7 +14,7 @@ const HeaderWithIcon = () => {
     };
 
     const handleConfirm = () => {
-        localStorage.clear();
+        sessionStorage.clear();
         setShowModal(false);
         navigate("/");
     };

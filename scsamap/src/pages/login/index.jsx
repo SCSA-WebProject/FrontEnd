@@ -5,6 +5,7 @@ import Input from "../../components/common/Input";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import axios from "axios";
+import Modal from "../../components/common/Modal";
 
 const LoginPage = () => {
     const navigate = useNavigate();
@@ -12,6 +13,7 @@ const LoginPage = () => {
     // ✅ 상태 정의
     const [id, setId] = useState("");
     const [password, setPassword] = useState("");
+    const [showModal, setShowModal] = useState(false);
 
     // ✅ 로그인 요청 함수
     const handleSubmit = async (e) => {
@@ -26,25 +28,34 @@ const LoginPage = () => {
             });
 
             if (response.data.error) {
-                alert(response.data.error);
-                return; // 로그인 페이지에 머무름
+                setShowModal(true);
+                return;
             }
 
-            console.log("로그인 성공:", response.data);
-
-            // 예: 응답 데이터 저장 또는 처리
             sessionStorage.setItem("user", JSON.stringify(response.data.user));
-            
-            // 메인 페이지로 이동
             navigate('/main');
         } catch (error) {
             console.error("로그인 실패:", error);
-            alert("아이디 또는 비밀번호가 일치하지 않습니다.");
+            setShowModal(true);
         }
+    };
+
+    const handleModalConfirm = () => {
+        setShowModal(false);
     };
 
     return (
         <Container>
+            {showModal && (
+                <Modal
+                    title="로그인 실패"
+                    content="아이디 또는 비밀번호가 일치하지 않습니다."
+                    item1Label="확인"
+                    item2Label=""
+                    onItem1Click={handleModalConfirm}
+                    onItem2Click={() => {}}
+                />
+            )}
             {/* 프로젝트 이름 + 로고 이미지 */}
             <LogoContainer>
                 <Logo>슥슐랭 가이드</Logo>
@@ -71,6 +82,16 @@ const LoginPage = () => {
             <SignUpText onClick={() => navigate('/signup')}>
                 아직 회원이 아니신가요?
             </SignUpText>
+            {showModal && (
+                <Modal
+                    title="로그인 실패"
+                    content="아이디 또는 비밀번호가 일치하지 않습니다."
+                    item1Label="확인"
+                    item2Label=""
+                    onItem1Click={handleModalConfirm}
+                    onItem2Click={() => {}}
+                />
+            )}
         </Container>
     );
 };
