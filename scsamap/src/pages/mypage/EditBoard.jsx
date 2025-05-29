@@ -1,31 +1,52 @@
 import styled from "styled-components";
-import Button from "../../components/common/Button";
 import HeaderWithBack from "../../components/common/HeaderWithBack";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import axios from "axios";
 
-const RegisterPage = () => {
+const PlaceEditPage = () => {
+    const { id } = useParams();
     const [title, setTitle] = useState("");
-    const [region, setRegion] = useState("서울");
-    const [category, setCategory] = useState("중식");
+    const [region, setRegion] = useState("");
+    const [category, setCategory] = useState("");
     const [price, setPrice] = useState("");
     const [content, setContent] = useState("");
     const [address, setAddress] = useState("");
-    const [attach, setAttach] = useState(null)
-
+    const [attach, setAttach] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [filePath, setFilePath] = useState("");
+    const [systemName, setSystemName] = useState("");
     const navigate = useNavigate();
-    
+
     useEffect(() => {
+        // 주소 검색 스크립트 로드
         const script = document.createElement("script");
         script.src = "//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js";
         script.async = true;
         document.body.appendChild(script);
-
-        return () => {
-            document.body.removeChild(script);
-        };
+        return () => { document.body.removeChild(script); };
     }, []);
+
+    useEffect(() => {
+        // 기존 게시글 정보 불러오기
+        axios.get("http://localhost:8080/board/detail", {
+            params: { id },
+            withCredentials: true
+        })
+        .then(res => {
+            const board = res.data.board;
+            setTitle(board.title || "");
+            setRegion(board.region || "");
+            setCategory(board.category || "");
+            setPrice(board.price || "");
+            setContent(board.content || "");
+            setAddress(board.address || "");
+            setLoading(false);
+            setFilePath(board.boardFile?.filePath || "");
+            setSystemName(board.boardFile?.systemName || "");
+        })
+        .catch(() => setLoading(false));
+    }, [id]);
 
     const handleAddressSearch = () => {
         new window.daum.Postcode({
@@ -35,50 +56,49 @@ const RegisterPage = () => {
         }).open();
     };
 
-    const handleRegister = async (e) => {
+    const handleEdit = async (e) => {
         e.preventDefault();
-        
         if (!isFormFilled) return;
-
         const formData = new FormData();
+        formData.append("id", id);
         formData.append("title", title);
         formData.append("region", region);
         formData.append("category", category);
         formData.append("price", price);
         formData.append("content", content);
         formData.append("address", address);
-
         if (attach) formData.append("attach", attach);
-
         try {
-            await axios.post("http://localhost:8080/board/write", formData, {
-                headers: {
-                    "Content-Type": "multipart/form-data",
-                },
+            await axios.post("http://localhost:8080/board/update", formData, {
+                headers: { "Content-Type": "multipart/form-data" },
                 withCredentials: true,
             });
-            console.log(formData)
-            alert("등록이 완료되었습니다!");
-            navigate("/main");
+            alert("수정이 완료되었습니다!");
+            navigate(-1);
         } catch (err) {
-            alert("등록 실패: " + (err.response?.data?.error || err.message));
+            alert("수정 실패: " + (err.response?.data?.error || err.message));
         }
     };
 
-
-    // 하나라도 빈 값이 있으면 false
     const isFormFilled = title && price && content && address;
+
+    if (loading) return <div>로딩중...</div>;
 
     return (
         <Container>
-            <HeaderWithBack title="맛집 등록하기" />
-            <Form onSubmit={handleRegister}>
+            <HeaderWithBack title="정보 수정" />
+            <Form onSubmit={handleEdit}>
                 <Label>사진 첨부</Label>
                 <input
                     type="file"
                     accept="image/*"
                     onChange={e => setAttach(e.target.files[0])}
                 />
+                {systemName && (
+                    <div style={{ fontSize: "13px", color: "#888", marginTop: "4px" }}>
+                        기존 첨부 파일: {systemName}
+                    </div>
+                )}
                 <Label>상호명</Label>
                 <Row>
                     <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="예시) 넘버원 양꼬치 한남점" />
@@ -88,35 +108,31 @@ const RegisterPage = () => {
                 <Label>지역 & 분류</Label>
                 <Row>
                     <Select value={region} onChange={(e) => setRegion(e.target.value)}>
-					<option>서울</option>
-					<option>경기</option>
-					<option>인천</option>
-					<option>부산</option>
-					<option>대구</option>
-					<option>광주</option>
-					<option>대전</option>
-					<option>울산</option>
-					<option>세종</option>
-					<option>강원</option>
-					<option>충북</option>
-					<option>충남</option>
-					<option>전북</option>
-					<option>전남</option>
-					<option>경북</option>
-					<option>경남</option>
-					<option>제주</option>
-
-                        {/* 지역 추가 */}
+                        <option>서울</option>
+                        <option>경기</option>
+                        <option>인천</option>
+                        <option>부산</option>
+                        <option>대구</option>
+                        <option>광주</option>
+                        <option>대전</option>
+                        <option>울산</option>
+                        <option>세종</option>
+                        <option>강원</option>
+                        <option>충북</option>
+                        <option>충남</option>
+                        <option>전북</option>
+                        <option>전남</option>
+                        <option>경북</option>
+                        <option>경남</option>
+                        <option>제주</option>
                     </Select>
                     <Select value={category} onChange={(e) => setCategory(e.target.value)}>
                         <option>중식</option>
                         <option>한식</option>
                         <option>양식</option>
-                        <option>중식</option>
                         <option>일식</option>
                         <option>아시안</option>
                         <option>술집</option>
-                        {/* 분류 추가 */}
                     </Select>
                 </Row>
 
@@ -136,17 +152,19 @@ const RegisterPage = () => {
                     <Input value={address} onChange={(e) => setAddress(e.target.value)} placeholder="주소를 검색해주세요" readOnly />
                     <AddressButton type="button" onClick={handleAddressSearch}>주소 검색</AddressButton>
                 </Row>
-            
-                <Button text="등록" type="submit" width="100%" disabled={!isFormFilled} style={{ marginTop: "32px" }} />
+                <Button type="submit" disabled={!isFormFilled} style={{ marginTop: "32px" }}>수정하기</Button>
             </Form>
         </Container>
     );
 };
 
+export default PlaceEditPage;
+
 const Container = styled.div`
     max-width: 600px;
     margin: 0 auto;
     background: #fff;
+    padding: 0 16px;
     min-height: 100vh;
 `;
 
@@ -228,4 +246,20 @@ const AddressButton = styled.button`
     }
 `;
 
-export default RegisterPage;
+const Button = styled.button`
+    width: 100%;
+    height: 44px;
+    background: #0C4DA2;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 16px;
+    &:disabled {
+        background: #DEDEDE;
+        color: #fff;
+        cursor: not-allowed;
+    }
+`;

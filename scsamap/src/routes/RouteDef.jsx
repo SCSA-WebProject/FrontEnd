@@ -6,6 +6,7 @@ import PlaceListPage from '../pages/scchelin/PlaceList.jsx';
 import PlaceDetailPage from '../pages/scchelin/PlaceDetail.jsx';
 import PlaceMapPage from '../pages/scchelin/PlaceMap.jsx';
 import MyPage from '../pages/mypage/index.jsx';
+import PlaceEditPage from '../pages/mypage/EditBoard.jsx';
 
 const MainScreens = {
     LoginPage: {
@@ -29,7 +30,7 @@ const MainScreens = {
         element: <PlaceListPage />,
     },
     PlaceDetailPage: {
-        path: '/place/:placeId',
+        path: '/place/:id',
         element: <PlaceDetailPage />,
     },
     PlaceMapPage: {
@@ -39,6 +40,10 @@ const MainScreens = {
     MyPage: {
         path: '/mypage',
         element: <MyPage />,
+    },
+    PlaceEditPage: {
+        path: '/place/edit/:id',
+        element: <PlaceEditPage />,
     }
 };
 
