@@ -13,6 +13,7 @@ const PlaceDetailPage = () => {
     const [loading, setLoading] = useState(true);
     const [marker, setMarker] = useState(null);
     const [map, setMap] = useState(null);
+    const [isGoogleMapsLoaded, setIsGoogleMapsLoaded] = useState(false);
     const IMG_BASE_PATH = "http://localhost:8080/img";
 
     const mapStyles = {
@@ -69,6 +70,25 @@ const PlaceDetailPage = () => {
         fetchPlaceDetail();
     }, [id]);
 
+    useEffect(() => {
+        // Google Maps API 로드 상태 확인
+        if (window.google) {
+            setIsGoogleMapsLoaded(true);
+        } else {
+            const checkGoogleMaps = setInterval(() => {
+                if (window.google) {
+                    setIsGoogleMapsLoaded(true);
+                    clearInterval(checkGoogleMaps);
+                }
+            }, 100);
+
+            // 5초 후에도 로드되지 않으면 인터벌 제거
+            setTimeout(() => {
+                clearInterval(checkGoogleMaps);
+            }, 5000);
+        }
+    }, []);
+
     if (loading) return <div>로딩중...</div>;
     if (!id || !place) return <div>존재하지 않는 가게입니다.</div>;
 
@@ -109,26 +129,11 @@ const PlaceDetailPage = () => {
                 {place.address && (
                     <MapContainer>
                         <MapTitle>위치</MapTitle>
-                        {!window.google && (
-                            <LoadScript 
-                                googleMapsApiKey="AIzaSyDYXffkmjbxrESgfErWK0UZ7FshBLinnI4"
-                            >
-                                <GoogleMap
-                                    mapContainerStyle={mapStyles}
-                                    zoom={15}
-                                    center={marker?.position || defaultCenter}
-                                    onLoad={setMap}
-                                >
-                                    {marker && (
-                                        <Marker
-                                            position={marker.position}
-                                            title={marker.title}
-                                        />
-                                    )}
-                                </GoogleMap>
-                            </LoadScript>
-                        )}
-                        {window.google && (
+                        {!isGoogleMapsLoaded ? (
+                            <div style={{ height: "300px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                                지도를 불러오는 중...
+                            </div>
+                        ) : (
                             <GoogleMap
                                 mapContainerStyle={mapStyles}
                                 zoom={15}
