@@ -5,11 +5,12 @@ import HeaderWithBack from "../../components/common/HeaderWithBack";
 import axios from "axios";
 
 const categories = ["전체", "한식", "중식", "일식", "양식", "아시안", "술집"];
-const filters = ["좋아요 순", "최근 등록 순", "가격 높은 순", "가격 낮은 순"];
+const filters = ["최근 등록 순", "좋아요 순", "가격 높은 순", "가격 낮은 순"];
+
 
 const PlaceListPage = () => {
     const [selectedCategory, setSelectedCategory] = useState("전체");
-    const [selectedFilter, setSelectedFilter] = useState("내 주변");
+    const [selectedFilter, setSelectedFilter] = useState("최근 등록 순");
     const [places, setPlaces] = useState([]);
     const [page, setPage] = useState(1);
     const [hasMore, setHasMore] = useState(true);
@@ -22,21 +23,42 @@ const PlaceListPage = () => {
 
     const fetchPlaces = useCallback(async () => {
         try {
-            const res = await axios.get("http://localhost:8080/board/list", {
-                params: { page, listSize: 5 },
+            let orderBy = "id"; // 기본값: 최근 등록 순
+            switch(selectedFilter) {
+                case "좋아요 순":
+                    orderBy = "like_count";
+                    break;
+                case "가격 높은 순":
+                    orderBy = "price_desc";
+                    break;
+                case "가격 낮은 순":
+                    orderBy = "price_asc";
+                    break;
+                default:
+                    orderBy = "id";
+            }
+
+            const res = await axios.get("http://localhost:8080/board/search", {
+                params: { 
+                    page, 
+                    listSize: 5,
+                    orderBy: orderBy
+                },
             });
             const newBoards = res.data.boards || [];
             setPlaces((prev) => [...prev, ...newBoards]);
-            setHasMore(newBoards.length === 5); // 5개 미만이면 마지막 페이지
+            setHasMore(newBoards.length === 5);
             setLoading(false);
         } catch (e) {
             setLoading(false);
         }
-    }, [page, hasMore, loading]);
+    }, [page, selectedFilter]);
 
     useEffect(() => {
+        setPlaces([]); // 필터 변경시 목록 초기화
+        setPage(1);    // 페이지 초기화
         fetchPlaces();
-    }, [page]);
+    }, [selectedFilter]);
 
     console.log(places)
 
@@ -67,13 +89,13 @@ const PlaceListPage = () => {
             ))}
         </CategoryBar>
         <FilterBar>
-            <Select>
-            {filters.map((f) => (
-                <option key={f}>{f}</option>
-            ))}
+            <Select value={selectedFilter} onChange={(e) => setSelectedFilter(e.target.value)}>
+                {filters.map((f) => (
+                    <option key={f}>{f}</option>
+                ))}
             </Select>
             <FilterBtn selected={selectedFilter === "지역"} onClick={() => setSelectedFilter("지역")}>
-            지역
+                지역
             </FilterBtn>
         </FilterBar>
         <List>
