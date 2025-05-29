@@ -2,20 +2,39 @@ import styled from "styled-components";
 import Button from "../../components/common/Button";
 import HeaderWithBack from "../../components/common/HeaderWithBack";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 
 const RegisterPage = () => {
     const [title, setTitle] = useState("");
-    const [region, setRegion] = useState("");
-    const [category, setCategory] = useState("");
+    const [region, setRegion] = useState("서울");
+    const [category, setCategory] = useState("중식");
     const [price, setPrice] = useState("");
     const [content, setContent] = useState("");
-    const [address, setAddress] = useState("서울특별시 용산구 한남동");
+    const [address, setAddress] = useState("");
     const [attach, setAttach] = useState(null)
 
     const navigate = useNavigate();
     
+    useEffect(() => {
+        const script = document.createElement("script");
+        script.src = "//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js";
+        script.async = true;
+        document.body.appendChild(script);
+
+        return () => {
+            document.body.removeChild(script);
+        };
+    }, []);
+
+    const handleAddressSearch = () => {
+        new window.daum.Postcode({
+            oncomplete: function(data) {
+                setAddress(data.address);
+            }
+        }).open();
+    };
+
     const handleRegister = async (e) => {
         e.preventDefault();
         
@@ -48,7 +67,7 @@ const RegisterPage = () => {
 
 
     // 하나라도 빈 값이 있으면 false
-    const isFormFilled = title && price && content;
+    const isFormFilled = title && price && content && address;
 
     return (
         <Container>
@@ -69,15 +88,34 @@ const RegisterPage = () => {
                 <Label>지역 & 분류</Label>
                 <Row>
                     <Select value={region} onChange={(e) => setRegion(e.target.value)}>
-                        <option>경기</option>
-                        <option>서울</option>
-                        <option>부산</option>
+					<option>서울</option>
+					<option>경기</option>
+					<option>인천</option>
+					<option>부산</option>
+					<option>대구</option>
+					<option>광주</option>
+					<option>대전</option>
+					<option>울산</option>
+					<option>세종</option>
+					<option>강원</option>
+					<option>충북</option>
+					<option>충남</option>
+					<option>전북</option>
+					<option>전남</option>
+					<option>경북</option>
+					<option>경남</option>
+					<option>제주</option>
+
                         {/* 지역 추가 */}
                     </Select>
                     <Select value={category} onChange={(e) => setCategory(e.target.value)}>
                         <option>중식</option>
                         <option>한식</option>
+                        <option>양식</option>
+                        <option>중식</option>
                         <option>일식</option>
+                        <option>아시안</option>
+                        <option>술집</option>
                         {/* 분류 추가 */}
                     </Select>
                 </Row>
@@ -91,6 +129,12 @@ const RegisterPage = () => {
                 <Label>한줄평</Label>
                 <Row>
                     <Input value={content} onChange={(e) => setContent(e.target.value)} placeholder="예시) 여기는 옥수수전이 미쳤어요" />
+                </Row>
+
+                <Label>주소</Label>
+                <Row>
+                    <Input value={address} onChange={(e) => setAddress(e.target.value)} placeholder="주소를 검색해주세요" readOnly />
+                    <AddressButton type="button" onClick={handleAddressSearch}>주소 검색</AddressButton>
                 </Row>
             
                 <Button text="등록" type="submit" width="100%" disabled={!isFormFilled} style={{ marginTop: "32px" }} />
@@ -167,6 +211,21 @@ const Select = styled.select`
 const Unit = styled.span`
     font-size: 12px;
     color: #176BCE;
+`;
+
+const AddressButton = styled.button`
+    width: 100px;
+    height: 44px;
+    background: #0C4DA2;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 14px;
+    cursor: pointer;
+    margin-left: 8px;
+    &:hover {
+        background: #0B3D82;
+    }
 `;
 
 export default RegisterPage;
