@@ -110,6 +110,14 @@ const SignUpPage = () => {
         modalCallback();
     };
 
+    // 연락처 자동 하이픈 함수
+    function formatPhoneNumber(value) {
+        const numbers = value.replace(/[^0-9]/g, "");
+        if (numbers.length < 4) return numbers;
+        if (numbers.length < 8) return numbers.slice(0, 3) + "-" + numbers.slice(3);
+        return numbers.slice(0, 3) + "-" + numbers.slice(3, 7) + "-" + numbers.slice(7, 11);
+    }
+
     return (
         <Container>
             <HeaderWithBack title="회원가입" />
@@ -124,7 +132,7 @@ const SignUpPage = () => {
                 <Label>이름</Label>
                 <Input placeholder="예시) 이준영" value={name} onChange={(e) => setName(e.target.value)} />
                 <Label>연락처</Label>
-                <Input placeholder="예시) 010-1234-5678" value={phone} onChange={(e) => setPhone(e.target.value)} />
+                <Input placeholder="예시) 010-1234-5678" value={phone} onChange={e => setPhone(formatPhoneNumber(e.target.value))} />
                 <Label>계열사</Label>
                 <SelectWrapper>
                     <StyledSelect value={company} onChange={(e) => setCompany(e.target.value)}>
