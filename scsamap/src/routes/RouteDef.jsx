@@ -5,6 +5,7 @@ import SignUpPage from '../pages/signup/index.jsx';
 import PlaceListPage from '../pages/scchelin/PlaceList.jsx';
 import PlaceDetailPage from '../pages/scchelin/PlaceDetail.jsx';
 import PlaceMapPage from '../pages/scchelin/PlaceMap.jsx';
+import MyPage from '../pages/mypage/index.jsx';
 
 const MainScreens = {
     LoginPage: {
@@ -34,6 +35,10 @@ const MainScreens = {
     PlaceMapPage: {
         path: '/placemap',
         element: <PlaceMapPage />,
+    },
+    MyPage: {
+        path: '/mypage',
+        element: <MyPage />,
     }
 };
 
