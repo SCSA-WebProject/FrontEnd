@@ -29,7 +29,7 @@ const MainScreens = {
         element: <PlaceListPage />,
     },
     PlaceDetailPage: {
-        path: '/place/:placeId',
+        path: '/place/:id',
         element: <PlaceDetailPage />,
     },
     PlaceMapPage: {
