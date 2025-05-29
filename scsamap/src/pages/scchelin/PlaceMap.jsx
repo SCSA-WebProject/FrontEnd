@@ -3,7 +3,6 @@ import HeaderWithBack from "../../components/common/HeaderWithBack";
 import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
 import { useState } from 'react';
 import axios from 'axios';
-import { useNavigate } from "react-router-dom";
 
 // axios 기본 설정
 axios.defaults.baseURL = 'http://localhost:8080';
@@ -13,7 +12,6 @@ const PlaceMapPage = () => {
     const [markers, setMarkers] = useState([]);
     const [map, setMap] = useState(null);
     const [boards, setBoards] = useState([]);
-    const navigate = useNavigate();
 
     const mapStyles = {
         height: "calc(100vh - 60px)",
@@ -139,7 +137,6 @@ const PlaceMapPage = () => {
                     ))}
                 </GoogleMap>
             </LoadScript>
-            <FixedListButton onClick={() => navigate('/placelist')}>맛집 목록</FixedListButton>
         </Container>
     );
 };
@@ -149,22 +146,4 @@ export default PlaceMapPage;
 const Container = styled.div`
     width: 100%;
     height: 100vh;
-`;
-
-const FixedListButton = styled.button`
-    position: fixed;
-    left: 0;
-    bottom: 20px;
-    width: 10%;
-    margin: 0 auto;
-    background: rgb(255, 255, 255);
-    color: #0C4DA2;
-    border: 1px solid #0C4DA2;
-    border-radius: 30px;
-    font-size: 12px;
-    font-weight: bold;
-    z-index: 100;
-    cursor: pointer;
-    left: 50%;
-    transform: translateX(-50%);
 `;
