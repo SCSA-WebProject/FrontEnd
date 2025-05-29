@@ -89,6 +89,31 @@ const PlaceDetailPage = () => {
         }
     }, []);
 
+    const handleLikeToggle = async () => {
+        try {
+            const response = await axios.post('http://localhost:8080/board/like', 
+                null,
+                { 
+                    params: { boardId: id },
+                    withCredentials: true 
+                }
+            );
+            
+            if (response.data.success) {
+                setPlace(prev => ({
+                    ...prev,
+                    liked: response.data.liked,
+                    likeCount: response.data.likeCount
+                }));
+            } else {
+                alert(response.data.error || '좋아요 처리에 실패했습니다.');
+            }
+        } catch (error) {
+            console.error('좋아요 처리 중 오류:', error);
+            alert('좋아요 처리 중 오류가 발생했습니다.');
+        }
+    };
+
     if (loading) return <div>로딩중...</div>;
     if (!id || !place) return <div>존재하지 않는 가게입니다.</div>;
 
@@ -117,8 +142,10 @@ const PlaceDetailPage = () => {
                     <Writer>작성자 | {place.userId}</Writer>
                 </WriterRow>
 
-                <Like>
-                    <span role="img" aria-label="thumbs up">👍</span> {place.likeCount}
+                <Like onClick={handleLikeToggle}>
+                    <span role="img" aria-label="heart">
+                        {place.liked ? '❤️' : '🤍'}
+                    </span> {place.likeCount}
                 </Like>
                 <InfoRow>
                     <InfoIcon>💰</InfoIcon>
@@ -224,6 +251,8 @@ const Like = styled.div`
     display: flex;
     align-items: center;
     gap: 8px;
+    cursor: pointer;
+    user-select: none;
 `;
 
 const Desc = styled.div`

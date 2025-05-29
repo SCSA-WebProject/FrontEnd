@@ -26,6 +26,40 @@ const MainPage = () => {
             });
     }, []);
 
+    const handleLikeToggle = async (boardId, e) => {
+        e.stopPropagation(); // 카드 클릭 이벤트 전파 방지
+        try {
+            const response = await axios.post('http://localhost:8080/board/like', 
+                null,
+                { 
+                    params: { boardId: boardId },
+                    withCredentials: true 
+                }
+            );
+            
+            if (response.data.success) {
+                // 최근 등록된 맛집 목록 업데이트
+                setRecentBoards(prev => prev.map(board => 
+                    board.id === boardId 
+                        ? { ...board, liked: response.data.liked, likeCount: response.data.likeCount }
+                        : board
+                ));
+                
+                // 인기 맛집 목록 업데이트
+                setPopularBoards(prev => prev.map(board => 
+                    board.id === boardId 
+                        ? { ...board, liked: response.data.liked, likeCount: response.data.likeCount }
+                        : board
+                ));
+            } else {
+                alert(response.data.error || '좋아요 처리에 실패했습니다.');
+            }
+        } catch (error) {
+            console.error('좋아요 처리 중 오류:', error);
+            alert('좋아요 처리 중 오류가 발생했습니다.');
+        }
+    };
+
     console.log(recentBoards);
     console.log(popularBoards);
 
@@ -58,13 +92,15 @@ const MainPage = () => {
                     <BlackText> 등록된 맛집</BlackText>
                 </SectionTitle>
                 <CardList>
-                {recentBoards.map((board, idx) => (
+                {recentBoards.map((board) => (
                     <PlaceCard
                         key={board.id}
-                        image={board.boardFile?.filePath ? IMG_BASE_PATH + board.boardFile.filePath + "/" + board.boardFile.systemName : ""} // 실제 이미지 필드가 있다면 board.image로 교체
+                        image={board.boardFile?.filePath ? IMG_BASE_PATH + board.boardFile.filePath + "/" + board.boardFile.systemName : ""}
                         category={board.category}
                         name={board.title}
-                        likes={board.likeCount || 0} // likes 필드가 있으면 사용, 없으면 0
+                        likes={board.likeCount || 0}
+                        liked={board.liked}
+                        onLikeClick={(e) => handleLikeToggle(board.id, e)}
                         path={`/place/${board.id}`}
                     />
                 ))}
@@ -78,13 +114,15 @@ const MainPage = () => {
                     <BlackText> 맛집</BlackText>
                 </SectionTitle>
                 <CardList>
-                    {popularBoards.map((board, idx) => (
+                    {popularBoards.map((board) => (
                         <PlaceCard
                             key={board.id}
-                            image={board.boardFile?.filePath ? IMG_BASE_PATH + board.boardFile.filePath + "/" + board.boardFile.systemName : ""} // 실제 이미지 필드가 있다면 board.image로 교체
+                            image={board.boardFile?.filePath ? IMG_BASE_PATH + board.boardFile.filePath + "/" + board.boardFile.systemName : ""}
                             category={board.category}
                             name={board.title}
-                            likes={board.likeCount || 0} // likes 필드가 있으면 사용, 없으면 0
+                            likes={board.likeCount || 0}
+                            liked={board.liked}
+                            onLikeClick={(e) => handleLikeToggle(board.id, e)}
                             path={`/place/${board.id}`}
                         />
                     ))}

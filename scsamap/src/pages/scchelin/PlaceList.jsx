@@ -44,6 +44,7 @@ const PlaceListPage = () => {
                     listSize: 5,
                     orderBy: orderBy
                 },
+                withCredentials: true  // 쿠키를 포함하여 요청
             });
             const newBoards = res.data.boards || [];
             setPlaces((prev) => [...prev, ...newBoards]);
@@ -73,6 +74,32 @@ const PlaceListPage = () => {
         });
         if (node) observer.current.observe(node);
     }, [loading, hasMore]);
+
+    const handleLikeToggle = async (boardId, e) => {
+        e.stopPropagation(); // 카드 클릭 이벤트 전파 방지
+        try {
+            const response = await axios.post('http://localhost:8080/board/like', 
+                null,
+                { 
+                    params: { boardId: boardId },
+                    withCredentials: true 
+                }
+            );
+            
+            if (response.data.success) {
+                setPlaces(prev => prev.map(place => 
+                    place.id === boardId 
+                        ? { ...place, liked: response.data.liked, likeCount: response.data.likeCount }
+                        : place
+                ));
+            } else {
+                alert(response.data.error || '좋아요 처리에 실패했습니다.');
+            }
+        } catch (error) {
+            console.error('좋아요 처리 중 오류:', error);
+            alert('좋아요 처리 중 오류가 발생했습니다.');
+        }
+    };
 
     return (
         <Container>
@@ -115,7 +142,12 @@ const PlaceListPage = () => {
                     >
                         <PlaceName>{place.title}</PlaceName>
                         <PlaceTitle>
-                        <span role="img" aria-label="thumbs up">👍</span> {place.likeCount} &nbsp; {place.region} | {place.category}
+                            <LikeButton onClick={(e) => handleLikeToggle(place.id, e)}>
+                                <span role="img" aria-label="heart">
+                                    {place.liked ? '❤️' : '🤍'}
+                                </span> {place.likeCount}
+                            </LikeButton>
+                            &nbsp; {place.region} | {place.category}
                         </PlaceTitle>
                         <PlaceImage src={place.boardFile?.filePath ? IMG_BASE_PATH + place.boardFile.filePath + "/" + place.boardFile.systemName : ""} alt={place.title} />
                         <Price>평균 가격대 {place.price?.toLocaleString()}만원</Price>
@@ -224,4 +256,13 @@ const FixedMapButton = styled.button`
     cursor: pointer;
     left: 50%;
     transform: translateX(-50%);
+`;
+
+const LikeButton = styled.div`
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    user-select: none;
+    font-size: 14px;
 `;
