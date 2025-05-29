@@ -7,8 +7,8 @@ import axios from "axios";
 
 const RegisterPage = () => {
     const [title, setTitle] = useState("");
-    const [region, setRegion] = useState("");
-    const [category, setCategory] = useState("");
+    const [region, setRegion] = useState("서울");
+    const [category, setCategory] = useState("중식");
     const [price, setPrice] = useState("");
     const [content, setContent] = useState("");
     const [address, setAddress] = useState("서울특별시 용산구 한남동");
