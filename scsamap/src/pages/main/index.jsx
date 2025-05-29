@@ -13,6 +13,7 @@ const MainPage = () => {
 
     const [recentBoards, setRecentBoards] = useState([]);
     const [popularBoards, setPopularBoards] = useState([]);
+    const IMG_BASE_PATH = "http://localhost:8080/img";
 
     useEffect(() => {
         axios.get("http://localhost:8080/main", { withCredentials: true })
@@ -60,10 +61,10 @@ const MainPage = () => {
                 {recentBoards.map((board, idx) => (
                     <PlaceCard
                         key={board.id}
-                        image={PlaceImg} // 실제 이미지 필드가 있다면 board.image로 교체
+                        image={board.boardFile?.filePath ? IMG_BASE_PATH + board.boardFile.filePath + "/" + board.boardFile.systemName : ""} // 실제 이미지 필드가 있다면 board.image로 교체
                         category={board.category}
                         name={board.title}
-                        likes={board.likes || 0} // likes 필드가 있으면 사용, 없으면 0
+                        likes={board.likeCount || 0} // likes 필드가 있으면 사용, 없으면 0
                         path={`/place/${board.id}`}
                     />
                 ))}
@@ -80,7 +81,7 @@ const MainPage = () => {
                     {popularBoards.map((board, idx) => (
                         <PlaceCard
                             key={board.id}
-                            image={PlaceImg} // 실제 이미지 필드가 있다면 board.image로 교체
+                            image={board.boardFile?.filePath ? IMG_BASE_PATH + board.boardFile.filePath + "/" + board.boardFile.systemName : ""} // 실제 이미지 필드가 있다면 board.image로 교체
                             category={board.category}
                             name={board.title}
                             likes={board.likeCount || 0} // likes 필드가 있으면 사용, 없으면 0

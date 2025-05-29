@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
-import PlaceImg from "../../assets/common/restaurantPic.jpg";
 import HeaderWithBack from "../../components/common/HeaderWithBack";
 import axios from "axios";
 
