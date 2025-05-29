@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import { useNavigate, useParams } from "react-router-dom";
 import PlaceImg from "../../assets/common/restaurantPic.jpg";
 import HeaderWithBack from "../../components/common/HeaderWithBack";
 import axios from "axios";
 import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
+import { MdMoreVert } from "react-icons/md";
 
 const PlaceDetailPage = () => {
     const { id } = useParams();
@@ -16,6 +17,24 @@ const PlaceDetailPage = () => {
     const [isGoogleMapsLoaded, setIsGoogleMapsLoaded] = useState(false);
     const IMG_BASE_PATH = "http://localhost:8080/img";
 
+    const [menuOpen, setMenuOpen] = useState(false);
+    const menuRef = useRef(null);
+
+    const userStr = sessionStorage.getItem("user");
+    const user = userStr ? JSON.parse(userStr) : null;
+    const myId = user ? user.id : null;
+    
+    useEffect(() => {
+        if (!menuOpen) return;
+        const handleClick = (e) => {
+            if (menuRef.current && !menuRef.current.contains(e.target)) {
+                setMenuOpen(false);
+            }
+        };
+        document.addEventListener("mousedown", handleClick);
+        return () => document.removeEventListener("mousedown", handleClick);
+    }, [menuOpen]);
+
     const mapStyles = {
         height: "300px",
         width: "100%"
@@ -24,6 +43,19 @@ const PlaceDetailPage = () => {
     const defaultCenter = {
         lat: 37.54813240071675,
         lng: 127.07340271976555
+    };
+
+    const handleDelete = () => {
+        axios.post("http://localhost:8080/board/delete", null, {
+            params: { id: id },
+            withCredentials: true
+        })
+        .then(() => {
+            navigate("/placelist");
+        })
+        .catch((err) => {
+            console.error("삭제 실패:", err);
+        });
     };
 
     useEffect(() => {
@@ -100,6 +132,7 @@ const PlaceDetailPage = () => {
                     src={place.boardFile?.filePath ? IMG_BASE_PATH + place.boardFile.filePath + "/" + place.boardFile.systemName : PlaceImg} 
                     alt={place.title} 
                 />
+                
                 <ImageDots>
                     {[...Array(1)].map((_, i) => (
                         <Dot key={i} $active={true} />
@@ -107,12 +140,25 @@ const PlaceDetailPage = () => {
                 </ImageDots>
             </TopImageBox>
             <Content>
-                <SubInfo>
-                    {place.region} | {place.category}
-                </SubInfo>
-                <TitleRow>
-                    <Title>{place.title}</Title>
-                </TitleRow>
+                <RowContainer>
+                    <div>
+                        <SubInfo>
+                            {place.region} | {place.category}
+                        </SubInfo>
+                        <Title>{place.title}</Title>
+                    </div>    
+                    {myId === place.userId && (
+                    <MenuIconBox>
+                        <MdMoreVert size={24} onClick={() => setMenuOpen((v) => !v)} style={{ cursor: "pointer" }} />
+                        {menuOpen && (
+                            <MenuBox ref={menuRef}>
+                                <MenuItem onClick={() => navigate(`/place/edit/${id}`)}>수정</MenuItem>
+                                <MenuItem onClick={handleDelete}>삭제</MenuItem>
+                            </MenuBox>
+                        )}
+                    </MenuIconBox>
+                    )}
+                </RowContainer>
                 <WriterRow>
                     <Writer>작성자 | {place.userId}</Writer>
                 </WriterRow>
@@ -194,6 +240,18 @@ const Dot = styled.div`
 const Content = styled.div`
     padding: 20px 16px 32px 16px;
 `;
+
+const RowContainer = styled.div`
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+`;
+const Row = styled.div`
+    display: flex;
+    align-items: center;
+    gap: 8px;
+`;
+
 const SubInfo = styled.div`
     color: #888;
     font-size: 15px;
@@ -261,4 +319,39 @@ const AddressText = styled.div`
     font-size: 14px;
     color: #666;
     background: #f8f8f8;
+`;
+
+const MenuIconBox = styled.div`
+    position: relative;  // 반드시 추가!
+    display: flex;
+    align-items: center;
+    height: 100%;
+`;
+
+const MenuBox = styled.div`
+    position: absolute;  // 반드시 추가!
+    top: 36px;           // 아이콘 아래로 띄우고 싶으면 top 조절
+    right: 0;
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    min-width: 80px;
+    padding: 8px 0;
+    display: flex;
+    flex-direction: column;
+    z-index: 100;
+`;
+
+const MenuItem = styled.button`
+    background: none;
+    border: none;
+    text-align: left;
+    padding: 10px 20px;
+    font-size: 16px;
+    color: #222;
+    cursor: pointer;
+    &:hover {
+        background: #f5f5f5;
+    }
 `;
