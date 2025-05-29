@@ -144,11 +144,9 @@ const RegisterPage = () => {
 };
 
 const Container = styled.div`
-    width: 90%;
     max-width: 600px;
     margin: 0 auto;
     background: #fff;
-    padding: 0 24px;
     min-height: 100vh;
 `;
 
@@ -157,6 +155,8 @@ const Form = styled.form`
     flex-direction: column;
     gap: 10px;
     margin-top: 20px;
+    margin-bottom: 40px;
+    padding: 0 16px;
 `;
 
 const Label = styled.label`
@@ -214,7 +214,7 @@ const Unit = styled.span`
 `;
 
 const AddressButton = styled.button`
-    width: 100px;
+    width: 40%;
     height: 44px;
     background: #0C4DA2;
     color: white;
