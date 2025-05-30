@@ -122,12 +122,30 @@ const PlaceListPage = () => {
             <FilterBtn selected={selectedFilter === "지역"} onClick={() => setShowRegionSheet(true)}>
                 지역
             </FilterBtn>
+            <SelectedRegionText>
+                {selectedRegion !== "전체" ? selectedRegion : ""}
+            </SelectedRegionText>
         </FilterBar>
         <List>
             {places
             .filter(
-                (p) => selectedRegion === "전체" || p.region === selectedRegion
+                (p) =>
+                    (selectedRegion === "전체" || p.region === selectedRegion) &&
+                    (selectedCategory === "전체" || p.category === selectedCategory)
             )
+            .sort((a, b) => {
+                if (selectedFilter === "좋아요 순") {
+                    return (b.likeCount || 0) - (a.likeCount || 0);
+                }
+                if (selectedFilter === "가격 높은 순") {
+                    return (b.price || 0) - (a.price || 0);
+                }
+                if (selectedFilter === "가격 낮은 순") {
+                    return (a.price || 0) - (b.price || 0);
+                }
+                // 최근 등록 순(기본): id 내림차순
+                return (b.id || 0) - (a.id || 0);
+            })
             .map((place, idx) => {
                 // IntersectionObserver ref는 필터링된 마지막 아이템에만!
                 const filtered = places.filter(
@@ -217,6 +235,13 @@ const FilterBtn = styled.button`
     padding: 4px 16px;
     font-size: 15px;
     cursor: pointer;
+`;
+
+const SelectedRegionText = styled.span`
+    margin-left: 8px;
+    color: #176BCE;
+    font-weight: bold;
+    font-size: 15px;
 `;
 
 const List = styled.div`

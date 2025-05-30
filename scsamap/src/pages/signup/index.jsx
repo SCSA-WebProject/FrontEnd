@@ -21,6 +21,7 @@ const SignUpPage = () => {
     const [modalTitle, setModalTitle] = useState("");
     const [modalContent, setModalContent] = useState("");
     const [modalCallback, setModalCallback] = useState(() => () => {});
+    const [isIdChecked, setIsIdChecked] = useState(false);
 
     const companyCodeMap = {
         DX: 100,
@@ -29,7 +30,7 @@ const SignUpPage = () => {
     };
 
     // 모든 input 태그에 값이 채워질 경우 '회원가입' 버튼 활성화
-    const isFormFilled = id && password && name && phone && company;
+    const isFormFilled = id && password && name && phone && company && isIdChecked;
 
     // 회원가입 버튼 클릭 시 메인 페이지로 이동
     const handleSignUp = async (e) => {
@@ -62,7 +63,6 @@ const SignUpPage = () => {
             setShowModal(true);
             setModalCallback(() => () => {
                 sessionStorage.setItem("user", JSON.stringify(data));
-                localStorage.setItem("user", JSON.stringify(data));
                 navigate("/main");
             });
         } catch (error) {
@@ -85,22 +85,26 @@ const SignUpPage = () => {
                 setModalContent("이미 사용 중인 아이디입니다.");
                 setShowModal(true);
                 setModalCallback(() => () => {});
+                setIsIdChecked(false);
             } else if (res.data === "available") {
                 setModalTitle("알림");
                 setModalContent("사용 가능한 아이디입니다!");
                 setShowModal(true);
                 setModalCallback(() => () => {});
+                setIsIdChecked(true);
             } else {
                 setModalTitle("알림");
                 setModalContent("서버 응답 오류");
                 setShowModal(true);
                 setModalCallback(() => () => {});
+                setIsIdChecked(false);
             }
         } catch (err) {
             setModalTitle("알림");
             setModalContent("중복 확인 중 오류가 발생했습니다.");
             setShowModal(true);
             setModalCallback(() => () => {});
+            setIsIdChecked(false);
             console.error(err);
         }
     };
@@ -124,8 +128,8 @@ const SignUpPage = () => {
             <Form onSubmit={handleSignUp}>
                 <Label>아이디</Label>
                 <Row>
-                    <Input placeholder="아이디를 입력해주세요." style={{flex: 1}} value={id} onChange={(e) => setId(e.target.value)} />
-                    <CheckButton type="button" disabled={!id} onClick={handleCheckId}>중복확인</CheckButton>
+                    <Input placeholder="아이디를 입력해주세요." style={{flex: 1}} value={id} onChange={(e) => { setId(e.target.value); setIsIdChecked(false); }} />
+                    <CheckButton type="button" disabled={!id || isIdChecked} onClick={handleCheckId}>중복확인</CheckButton>
                 </Row>
                 <Label>비밀번호</Label>
                 <Input placeholder="비밀번호를 입력해주세요." type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
