@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import HeaderWithBack from "../../components/common/HeaderWithBack";
-import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
+import { GoogleMap, LoadScript, Marker, InfoWindow } from '@react-google-maps/api';
 import { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from "react-router-dom";
@@ -13,6 +13,7 @@ const PlaceMapPage = () => {
     const [markers, setMarkers] = useState([]);
     const [map, setMap] = useState(null);
     const [boards, setBoards] = useState([]);
+    const [selectedLocation, setSelectedLocation] = useState(null);
     const navigate = useNavigate();
 
     const mapStyles = {
@@ -68,42 +69,45 @@ const PlaceMapPage = () => {
             const geocoder = new window.google.maps.Geocoder();
             console.log('Geocoder created');
 
-            const markers = await Promise.all(
-                boardsData.map(async (board) => {
-                    if (!board?.address) {
-                        console.log('No address for board:', board);
-                        return null;
-                    }
+            // 주소별로 게시글을 그룹화
+            const addressGroups = {};
+            boardsData.forEach(board => {
+                if (!board?.address) return;
+                if (!addressGroups[board.address]) {
+                    addressGroups[board.address] = [];
+                }
+                addressGroups[board.address].push(board);
+            });
 
-                    console.log('Processing address:', board.address);
-                    
+            const markers = await Promise.all(
+                Object.entries(addressGroups).map(async ([address, boards]) => {
                     try {
                         const result = await new Promise((resolve, reject) => {
                             geocoder.geocode({ 
-                                address: board.address,
-                                region: 'kr'  // 한국 지역 우선
+                                address: address,
+                                region: 'kr'
                             }, (results, status) => {
-                                console.log('Geocoding status:', status, 'for address:', board.address);
                                 if (status === 'OK' && results && results.length > 0) {
                                     resolve(results[0].geometry.location);
                                 } else {
-                                    console.warn(`Geocoding failed for address: ${board.address}, status: ${status}`);
                                     reject(new Error(`Geocoding failed: ${status}`));
                                 }
                             });
                         });
-                        
-                        console.log('Geocoding result:', result);
                         
                         return {
                             position: {
                                 lat: result.lat(),
                                 lng: result.lng()
                             },
-                            title: board.title || '제목 없음'
+                            address: address,
+                            boards: boards.map(board => ({
+                                id: board.id,
+                                title: board.title || '제목 없음'
+                            }))
                         };
                     } catch (error) {
-                        console.error('Geocoding error for address:', board.address, error);
+                        console.error('Geocoding error for address:', address, error);
                         return null;
                     }
                 })
@@ -134,9 +138,30 @@ const PlaceMapPage = () => {
                         <Marker
                             key={index}
                             position={marker.position}
-                            title={marker.title}
+                            onClick={() => setSelectedLocation(marker)}
                         />
                     ))}
+                    {selectedLocation && (
+                        <InfoWindow
+                            position={selectedLocation.position}
+                            onCloseClick={() => setSelectedLocation(null)}
+                        >
+                            <InfoWindowContent>
+                             
+                                {selectedLocation.boards.map((board, idx) => (
+                                    <RestaurantItem 
+                                        key={idx}
+                                        onClick={() => {
+                                            navigate(`/place/${board.id}`);
+                                            setSelectedLocation(null);
+                                        }}
+                                    >
+                                        {board.title}
+                                    </RestaurantItem>
+                                ))}
+                            </InfoWindowContent>
+                        </InfoWindow>
+                    )}
                 </GoogleMap>
             </LoadScript>
             <FixedListButton onClick={() => navigate('/placelist')}>맛집 목록</FixedListButton>
@@ -167,4 +192,27 @@ const FixedListButton = styled.button`
     cursor: pointer;
     left: 50%;
     transform: translateX(-50%);
+`;
+
+const InfoWindowContent = styled.div`
+    padding: 8px;
+    max-width: 200px;
+`;
+
+const InfoWindowTitle = styled.div`
+    font-size: 14px;
+    font-weight: bold;
+    margin-bottom: 8px;
+    color: #666;
+`;
+
+const RestaurantItem = styled.div`
+    padding: 8px;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 13px;
+    
+    &:hover {
+        background-color: #f5f5f5;
+    }
 `;
