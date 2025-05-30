@@ -3,6 +3,7 @@ import styled from "styled-components";
 import { useNavigate, useParams } from "react-router-dom";
 import PlaceImg from "../../assets/common/restaurantPic.jpg";
 import HeaderWithBack from "../../components/common/HeaderWithBack";
+import Modal from "../../components/common/Modal";
 import axios from "axios";
 import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
 import { MdMoreVert } from "react-icons/md";
@@ -16,6 +17,7 @@ const PlaceDetailPage = () => {
     const [map, setMap] = useState(null);
     const [isGoogleMapsLoaded, setIsGoogleMapsLoaded] = useState(false);
     const [writerInfo, setWriterInfo] = useState(null);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
     const IMG_BASE_PATH = "http://localhost:8080/img";
 
     const [menuOpen, setMenuOpen] = useState(false);
@@ -52,11 +54,16 @@ const PlaceDetailPage = () => {
             withCredentials: true
         })
         .then(() => {
-            navigate("/placelist");
+            setShowDeleteModal(true);
         })
         .catch((err) => {
             console.error("삭제 실패:", err);
         });
+    };
+
+    const handleDeleteConfirm = () => {
+        setShowDeleteModal(false);
+        navigate("/placelist");
     };
 
     useEffect(() => {
@@ -234,6 +241,14 @@ const PlaceDetailPage = () => {
                     </MapContainer>
                 )}
             </Content>
+            {showDeleteModal && (
+                <Modal
+                    title="삭제 완료"
+                    content="게시글이 삭제되었습니다."
+                    item1Label="확인"
+                    onItem1Click={handleDeleteConfirm}
+                />
+            )}
         </Container>
     );
 };
