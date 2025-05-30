@@ -100,7 +100,8 @@ const PlaceMapPage = () => {
                                 lat: result.lat(),
                                 lng: result.lng()
                             },
-                            title: board.title || '제목 없음'
+                            title: board.title || '제목 없음',
+                            id: board.id  // 게시글 ID 추가
                         };
                     } catch (error) {
                         console.error('Geocoding error for address:', board.address, error);
@@ -135,6 +136,7 @@ const PlaceMapPage = () => {
                             key={index}
                             position={marker.position}
                             title={marker.title}
+                            onClick={() => navigate(`/place/${marker.id}`)}
                         />
                     ))}
                 </GoogleMap>

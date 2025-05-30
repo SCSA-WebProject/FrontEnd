@@ -15,6 +15,7 @@ const PlaceDetailPage = () => {
     const [marker, setMarker] = useState(null);
     const [map, setMap] = useState(null);
     const [isGoogleMapsLoaded, setIsGoogleMapsLoaded] = useState(false);
+    const [writerInfo, setWriterInfo] = useState(null);
     const IMG_BASE_PATH = "http://localhost:8080/img";
 
     const [menuOpen, setMenuOpen] = useState(false);
@@ -72,6 +73,14 @@ const PlaceDetailPage = () => {
                 });
                 if (response.data.success) {
                     setPlace(response.data.board);
+                    // 작성자 정보 가져오기
+                    const writerResponse = await axios.get(`http://localhost:8080/user/info`, {
+                        params: { userId: response.data.board.userId },
+                        withCredentials: true
+                    });
+                    if (writerResponse.data.user) {
+                        setWriterInfo(writerResponse.data.user);
+                    }
                     // 주소가 있으면 지도 마커 설정
                     if (response.data.board.address && window.google) {
                         const geocoder = new window.google.maps.Geocoder();
@@ -185,7 +194,7 @@ const PlaceDetailPage = () => {
                     )}
                 </RowContainer>
                 <WriterRow>
-                    <Writer>작성자 | {place.userId}</Writer>
+                    <Writer>작성자 | {writerInfo ? `${writerInfo.companyName.toUpperCase()} ${writerInfo.name}` : place.userId}</Writer>
                 </WriterRow>
 
                 <Like onClick={handleLikeToggle}>
