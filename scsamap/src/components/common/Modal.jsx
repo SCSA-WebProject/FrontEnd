@@ -9,14 +9,24 @@ const Modal = ({
     onItem1Click,
     onItem2Click,
     }) => {
+    const isSingleButton = !item2Label;
+
     return (
         <ModalOverlay>
         <ModalContainer>
             <ModalTitle>{title}</ModalTitle>
             <ModalContent>{content}</ModalContent>
-            <ButtonRow>
-            <ModalButtonGray onClick={onItem1Click}>{item1Label}</ModalButtonGray>
-            <ModalButtonBlue onClick={onItem2Click}>{item2Label}</ModalButtonBlue>
+            <ButtonRow $single={isSingleButton}>
+                {isSingleButton ? (
+                    <ModalButtonSingle onClick={onItem1Click}>
+                        {item1Label}
+                    </ModalButtonSingle>
+                ) : (
+                    <>
+                        <ModalButtonGray onClick={onItem1Click}>{item1Label}</ModalButtonGray>
+                        <ModalButtonBlue onClick={onItem2Click}>{item2Label}</ModalButtonBlue>
+                    </>
+                )}
             </ButtonRow>
         </ModalContainer>
         </ModalOverlay>
@@ -47,14 +57,14 @@ const ModalContainer = styled.div`
 `;
 
 const ModalTitle = styled.div`
-    font-size: 2rem;
+    font-size: 1.5rem;
     font-weight: bold;
     color: #333;
     margin-bottom: 24px;
 `;
 
 const ModalContent = styled.div`
-    font-size: 1.25rem;
+    font-size: 1rem;
     color: #444;
     margin-bottom: 40px;
 `;
@@ -63,6 +73,12 @@ const ButtonRow = styled.div`
     display: flex;
     gap: 16px;
     justify-content: center;
+    ${({ $single }) =>
+        $single &&
+        `
+        gap: 0;
+        justify-content: center;
+    `}
 `;
 
 const ModalButtonGray = styled.button`
@@ -89,6 +105,21 @@ const ModalButtonBlue = styled.button`
     padding: 16px 0;
     cursor: pointer;
     transition: background 0.15s;
+`;
+
+const ModalButtonSingle = styled.button`
+    flex: 1;
+    background: #0C4DA2;
+    color: #fff;
+    font-size: 1.25rem;
+    font-weight: bold;
+    border: none;
+    border-radius: 12px;
+    padding: 16px 0;
+    cursor: pointer;
+    transition: background 0.15s;
+    width: 100%;
+    max-width: 220px;
 `;
 
 export default Modal; 

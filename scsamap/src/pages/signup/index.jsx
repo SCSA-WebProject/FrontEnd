@@ -6,6 +6,7 @@ import Button from "../../components/common/Button";
 import { IoIosArrowDown } from "react-icons/io";
 import { useState } from "react";
 import axios from "axios";
+import Modal from "../../components/common/Modal";
 
 const SignUpPage = () => {
 
@@ -16,6 +17,16 @@ const SignUpPage = () => {
     const [name, setName] = useState('');
     const [phone, setPhone] = useState('');
     const [company, setCompany] = useState('DX');
+    const [showModal, setShowModal] = useState(false);
+    const [modalTitle, setModalTitle] = useState("");
+    const [modalContent, setModalContent] = useState("");
+    const [modalCallback, setModalCallback] = useState(() => () => {});
+
+    const companyCodeMap = {
+        DX: 100,
+        DS: 200,
+        SDS: 300,
+    };
 
     // 모든 input 태그에 값이 채워질 경우 '회원가입' 버튼 활성화
     const isFormFilled = id && password && name && phone && company;
@@ -31,12 +42,12 @@ const SignUpPage = () => {
             name,
             phone,
             classNum: 1, // 실제 입력값으로 대체
-            companyCode: 200, // 실제 입력값으로 대체 (100 : DX, 200 : DS, 300 : SDS)
-            companyName: "dx",
+            companyCode: companyCodeMap[company],
+            companyName: company,
         };
     
         try {
-            const response = await axios.post(
+            await axios.post(
                 "http://localhost:8080/signup",
                 data,
                 {
@@ -46,15 +57,19 @@ const SignUpPage = () => {
                     withCredentials: true,
                 }
             );
-            console.log(response);
-            alert("회원가입이 완료되었습니다!");
-
-            sessionStorage.setItem("user", JSON.stringify(data));
-            localStorage.setItem("user", JSON.stringify(data));
-            navigate("/main");
-            
+            setModalTitle("회원가입 완료");
+            setModalContent("회원가입이 완료되었습니다!");
+            setShowModal(true);
+            setModalCallback(() => () => {
+                sessionStorage.setItem("user", JSON.stringify(data));
+                localStorage.setItem("user", JSON.stringify(data));
+                navigate("/main");
+            });
         } catch (error) {
-            alert("회원가입 실패: " + (error.response?.data?.error || error.message));
+            setModalTitle("회원가입 실패");
+            setModalContent("회원가입 실패: " + (error.response?.data?.error || error.message));
+            setShowModal(true);
+            setModalCallback(() => () => {});
         }
     };
 
@@ -66,17 +81,42 @@ const SignUpPage = () => {
                 params: { id }
             });
             if (res.data === "duplicate") {
-                alert("이미 사용 중인 아이디입니다.");
+                setModalTitle("알림");
+                setModalContent("이미 사용 중인 아이디입니다.");
+                setShowModal(true);
+                setModalCallback(() => () => {});
             } else if (res.data === "available") {
-                alert("사용 가능한 아이디입니다!");
+                setModalTitle("알림");
+                setModalContent("사용 가능한 아이디입니다!");
+                setShowModal(true);
+                setModalCallback(() => () => {});
             } else {
-                alert("서버 응답 오류");
+                setModalTitle("알림");
+                setModalContent("서버 응답 오류");
+                setShowModal(true);
+                setModalCallback(() => () => {});
             }
         } catch (err) {
-            alert("중복 확인 중 오류가 발생했습니다.");
+            setModalTitle("알림");
+            setModalContent("중복 확인 중 오류가 발생했습니다.");
+            setShowModal(true);
+            setModalCallback(() => () => {});
             console.error(err);
         }
     };
+
+    const handleModalConfirm = () => {
+        setShowModal(false);
+        modalCallback();
+    };
+
+    // 연락처 자동 하이픈 함수
+    function formatPhoneNumber(value) {
+        const numbers = value.replace(/[^0-9]/g, "");
+        if (numbers.length < 4) return numbers;
+        if (numbers.length < 8) return numbers.slice(0, 3) + "-" + numbers.slice(3);
+        return numbers.slice(0, 3) + "-" + numbers.slice(3, 7) + "-" + numbers.slice(7, 11);
+    }
 
     return (
         <Container>
@@ -92,7 +132,7 @@ const SignUpPage = () => {
                 <Label>이름</Label>
                 <Input placeholder="예시) 이준영" value={name} onChange={(e) => setName(e.target.value)} />
                 <Label>연락처</Label>
-                <Input placeholder="예시) 010-1234-5678" value={phone} onChange={(e) => setPhone(e.target.value)} />
+                <Input placeholder="예시) 010-1234-5678" value={phone} onChange={e => setPhone(formatPhoneNumber(e.target.value))} />
                 <Label>계열사</Label>
                 <SelectWrapper>
                     <StyledSelect value={company} onChange={(e) => setCompany(e.target.value)}>
@@ -104,6 +144,16 @@ const SignUpPage = () => {
                 </SelectWrapper>
                 <Button text="회원가입" type="submit" width="100%" disabled={!isFormFilled} style={{ marginTop: "32px" }} />
             </Form>
+            {showModal && (
+                <Modal
+                    title={modalTitle}
+                    content={modalContent}
+                    item1Label="확인"
+                    item2Label=""
+                    onItem1Click={handleModalConfirm}
+                    onItem2Click={() => {}}
+                />
+            )}
         </Container>
     );
 

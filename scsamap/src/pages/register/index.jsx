@@ -4,6 +4,7 @@ import HeaderWithBack from "../../components/common/HeaderWithBack";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import axios from "axios";
+import Modal from "../../components/common/Modal";
 
 const RegisterPage = () => {
     const [title, setTitle] = useState("");
@@ -13,6 +14,8 @@ const RegisterPage = () => {
     const [content, setContent] = useState("");
     const [address, setAddress] = useState("");
     const [attach, setAttach] = useState(null)
+
+    const [showModal, setShowModal] = useState(false);
 
     const navigate = useNavigate();
     
@@ -33,6 +36,11 @@ const RegisterPage = () => {
                 setAddress(data.address);
             }
         }).open();
+    };
+
+    const handleModalConfirm = () => {
+        setShowModal(false);
+        navigate("/main");
     };
 
     const handleRegister = async (e) => {
@@ -57,9 +65,7 @@ const RegisterPage = () => {
                 },
                 withCredentials: true,
             });
-            console.log(formData)
-            alert("등록이 완료되었습니다!");
-            navigate("/main");
+            setShowModal(true);
         } catch (err) {
             alert("등록 실패: " + (err.response?.data?.error || err.message));
         }
@@ -139,16 +145,24 @@ const RegisterPage = () => {
             
                 <Button text="등록" type="submit" width="100%" disabled={!isFormFilled} style={{ marginTop: "32px" }} />
             </Form>
+            {showModal && (
+                <Modal
+                    title="알림"
+                    content="등록이 완료되었습니다!"
+                    item1Label="확인"
+                    item2Label=""
+                    onItem1Click={handleModalConfirm}
+                    onItem2Click={() => {}}
+                />
+            )}
         </Container>
     );
 };
 
 const Container = styled.div`
-    width: 90%;
     max-width: 600px;
     margin: 0 auto;
     background: #fff;
-    padding: 0 24px;
     min-height: 100vh;
 `;
 
@@ -157,6 +171,8 @@ const Form = styled.form`
     flex-direction: column;
     gap: 10px;
     margin-top: 20px;
+    margin-bottom: 40px;
+    padding: 0 16px;
 `;
 
 const Label = styled.label`
@@ -214,7 +230,7 @@ const Unit = styled.span`
 `;
 
 const AddressButton = styled.button`
-    width: 100px;
+    width: 40%;
     height: 44px;
     background: #0C4DA2;
     color: white;
