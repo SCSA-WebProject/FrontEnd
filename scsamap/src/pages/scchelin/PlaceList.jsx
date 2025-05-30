@@ -61,8 +61,6 @@ const PlaceListPage = () => {
         fetchPlaces();
     }, [selectedFilter]);
 
-    console.log(places)
-
     // IntersectionObserver 설정
     const lastItemRef = useCallback((node) => {
         if (loading) return;

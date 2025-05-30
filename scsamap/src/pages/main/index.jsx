@@ -2,7 +2,6 @@ import HeaderWithIcon from "../../components/common/HeaderWithIcon";
 import styled from "styled-components";
 import BannerImg from "../../assets/main/Banner.svg";
 import PlaceCard from "../../components/common/PlaceCard";
-import PlaceImg from "../../assets/common/restaurantPic.jpg";
 import { FaUtensils } from "react-icons/fa";
 import { BiSearch } from "react-icons/bi";
 import { useNavigate } from "react-router-dom";
@@ -59,9 +58,6 @@ const MainPage = () => {
             alert('좋아요 처리 중 오류가 발생했습니다.');
         }
     };
-
-    console.log(recentBoards);
-    console.log(popularBoards);
 
     const navigate = useNavigate();
     return (

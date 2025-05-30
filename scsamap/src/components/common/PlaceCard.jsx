@@ -39,14 +39,24 @@ const CardWrapper = styled.div`
 
 const ImageWrapper = styled.div`
     width: 100%;
+    aspect-ratio: 4/3;      // 160:120 비율 유지 (지원 안되면 height: 120px 사용)
     border-radius: 12px;
     overflow: hidden;
+    background: #f5f5f5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 `;
 
 const PlaceImg = styled.img`
     width: 100%;
     height: 100%;
     object-fit: cover;
+    display: block;
+`;
+
+const Content = styled.div`
+    padding: 12px;
 `;
 
 const Content = styled.div`
