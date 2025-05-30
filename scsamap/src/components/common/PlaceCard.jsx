@@ -59,6 +59,10 @@ const Content = styled.div`
     padding: 12px;
 `;
 
+const Content = styled.div`
+    padding: 12px;
+`;
+
 const Category = styled.div`
     background: #191847;
     color: #fff;
