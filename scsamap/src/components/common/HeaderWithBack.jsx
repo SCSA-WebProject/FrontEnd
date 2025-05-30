@@ -13,9 +13,7 @@ const HeaderWithBack = ({ title }) => {
     return (
         <Container>
             <Header>
-                <ButtonContainer onClick={handleBack}>
-                    <BackButton><IoIosArrowBack size={24} /></BackButton>
-                </ButtonContainer>
+                <BackButton onClick={handleBack}><IoIosArrowBack size={24} /></BackButton>
                 <Title>{title}</Title>
             </Header>
         </Container>
@@ -33,10 +31,10 @@ const Container = styled.div`
 const Header = styled.div`
     width: 100%;
     height: 100%;
-    position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
+    position: relative;
 `;
 
 const ButtonContainer = styled.div`
@@ -47,12 +45,6 @@ const ButtonContainer = styled.div`
 `;
 
 const BackButton = styled.div`
-    position: absolute;
-    left: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 40px;
-    height: 40px;
     background: none;
     border: none;
     font-size: 28px;
@@ -61,18 +53,28 @@ const BackButton = styled.div`
     display: flex;
     align-items: center;
     justify-content: center;
+    width: 40px;
+    height: 40px;
+    margin-right: 8px;
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 2;
 `;
 
 const Title = styled.div`
-    width: 100%;
     font-size: 18px;
     font-weight: bold;
     text-align: center;
+    width: 100%;
+    pointer-events: none; // 타이틀이 클릭 이벤트를 막지 않게!
     position: absolute;
     left: 0;
     right: 0;
     top: 50%;
     transform: translateY(-50%);
+    z-index: 1;
 `;
 
 export default HeaderWithBack;

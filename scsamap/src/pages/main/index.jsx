@@ -2,7 +2,6 @@ import HeaderWithIcon from "../../components/common/HeaderWithIcon";
 import styled from "styled-components";
 import BannerImg from "../../assets/main/Banner.svg";
 import PlaceCard from "../../components/common/PlaceCard";
-import PlaceImg from "../../assets/common/restaurantPic.jpg";
 import { FaUtensils } from "react-icons/fa";
 import { BiSearch } from "react-icons/bi";
 import { useNavigate } from "react-router-dom";
@@ -25,9 +24,6 @@ const MainPage = () => {
                 console.error("메인 데이터 불러오기 실패:", err);
             });
     }, []);
-
-    console.log(recentBoards);
-    console.log(popularBoards);
 
     const navigate = useNavigate();
     return (
