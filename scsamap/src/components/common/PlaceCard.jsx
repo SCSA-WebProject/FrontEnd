@@ -2,7 +2,7 @@ import React from "react";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 
-const PlaceCard = ({ image, category, name, likes, path }) => {
+const PlaceCard = ({ image, category, name, likes, liked, onLikeClick, path }) => {
     const navigate = useNavigate();
 
     return (
@@ -10,12 +10,16 @@ const PlaceCard = ({ image, category, name, likes, path }) => {
             <ImageWrapper>
                 <PlaceImg src={image} alt={name} />
             </ImageWrapper>
-            <Category>{category}</Category>
-            <PlaceName>{name}</PlaceName>
-            <Likes>
-                <span role="img" aria-label="like">👍</span>
-                <LikesText>{likes}</LikesText>
-            </Likes>
+            <Content>
+                <Category>{category}</Category>
+                <PlaceName>{name}</PlaceName>
+                <LikeButton onClick={onLikeClick}>
+                    <span role="img" aria-label={liked ? "heart" : "heart-outline"}>
+                        {liked ? '❤️' : '🤍'}
+                    </span>
+                    {likes}
+                </LikeButton>
+            </Content>
         </CardWrapper>
     );
 };
@@ -51,6 +55,10 @@ const PlaceImg = styled.img`
     display: block;
 `;
 
+const Content = styled.div`
+    padding: 12px;
+`;
+
 const Category = styled.div`
     background: #191847;
     color: #fff;
@@ -71,17 +79,13 @@ const PlaceName = styled.div`
     width: 100%;
 `;
 
-const Likes = styled.div`
-    color: #FFD36F;
-    font-size: 12px;
+const LikeButton = styled.div`
     display: flex;
     align-items: center;
-    margin-top: 2px;
-`;
-
-const LikesText = styled.div`
-    color: #ABABAB;
-    margin-left: 4px;
+    gap: 4px;
+    font-size: 12px;
+    cursor: pointer;
+    user-select: none;
 `;
 
 export default PlaceCard; 
