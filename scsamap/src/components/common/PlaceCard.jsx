@@ -10,16 +10,14 @@ const PlaceCard = ({ image, category, name, likes, liked, onLikeClick, path }) =
             <ImageWrapper>
                 <PlaceImg src={image} alt={name} />
             </ImageWrapper>
-            <Content>
-                <Category>{category}</Category>
-                <PlaceName>{name}</PlaceName>
-                <LikeButton onClick={onLikeClick}>
-                    <span role="img" aria-label={liked ? "heart" : "heart-outline"}>
-                        {liked ? '❤️' : '🤍'}
-                    </span>
-                    {likes}
-                </LikeButton>
-            </Content>
+            <Category>{category}</Category>
+            <PlaceName>{name}</PlaceName>
+            <LikeButton onClick={onLikeClick}>
+                <span role="img" aria-label={liked ? "heart" : "heart-outline"}>
+                    {liked ? '❤️' : '🤍'}
+                </span>
+                {likes}
+            </LikeButton>
         </CardWrapper>
     );
 };
@@ -55,13 +53,6 @@ const PlaceImg = styled.img`
     display: block;
 `;
 
-const Content = styled.div`
-    padding: 12px;
-`;
-
-const Content = styled.div`
-    padding: 12px;
-`;
 
 const Category = styled.div`
     background: #191847;
