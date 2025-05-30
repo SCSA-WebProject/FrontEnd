@@ -18,39 +18,31 @@ const PlaceListPage = () => {
     const observer = useRef();
     const navigate = useNavigate();
 
+    const [showRegionSheet, setShowRegionSheet] = useState(false);
+    const [selectedRegion, setSelectedRegion] = useState("전체");
+
     const IMG_BASE_PATH = "http://localhost:8080/img";
 
     const fetchPlaces = useCallback(async (isRefresh = false) => {
         setLoading(true);
         try {
-            let orderBy = "id"; // 기본값: 최근 등록 순
+            let orderBy = "id";
             switch(selectedFilter) {
-                case "좋아요 순":
-                    orderBy = "like_count";
-                    break;
-                case "가격 높은 순":
-                    orderBy = "price_desc";
-                    break;
-                case "가격 낮은 순":
-                    orderBy = "price_asc";
-                    break;
-                default:
-                    orderBy = "id";
+                case "좋아요 순": orderBy = "like_count"; break;
+                case "가격 높은 순": orderBy = "price_desc"; break;
+                case "가격 낮은 순": orderBy = "price_asc"; break;
+                default: orderBy = "id";
             }
-
+            const params = { page, listSize: 5, orderBy };
             const res = await axios.get("http://localhost:8080/board/search", {
-                params: { 
-                    page, 
-                    listSize: 5,
-                    orderBy: orderBy
-                },
-                withCredentials: true  // 쿠키를 포함하여 요청
+                params,
+                withCredentials: true
             });
             const newBoards = res.data.boards || [];
             setPlaces((prev) => isRefresh ? newBoards : [...prev, ...newBoards]);
             setHasMore(newBoards.length === 5);
             setLoading(false);
-        } catch (e) {
+        } catch {
             setLoading(false);
         }
     }, [page, selectedFilter]);
@@ -106,7 +98,7 @@ const PlaceListPage = () => {
             alert('좋아요 처리 중 오류가 발생했습니다.');
         }
     };
-
+    console.log(places)
     return (
         <Container>
         <HeaderWithBack title="24기 맛집" />
@@ -127,22 +119,24 @@ const PlaceListPage = () => {
                     <option key={f}>{f}</option>
                 ))}
             </Select>
-            <FilterBtn selected={selectedFilter === "지역"} onClick={() => setSelectedFilter("지역")}>
+            <FilterBtn selected={selectedFilter === "지역"} onClick={() => setShowRegionSheet(true)}>
                 지역
             </FilterBtn>
         </FilterBar>
         <List>
             {places
             .filter(
-                (p) =>
-                selectedCategory === "전체" || p.category === selectedCategory
+                (p) => selectedRegion === "전체" || p.region === selectedRegion
             )
-            .map((place, idx, arr) => {
+            .map((place, idx) => {
                 // IntersectionObserver ref는 필터링된 마지막 아이템에만!
-                const isLast = idx === arr.length - 1;
+                const filtered = places.filter(
+                    (p) => selectedRegion === "전체" || p.region === selectedRegion
+                );
+                const isLast = idx === filtered.length - 1;
                 return (
                     <PlaceCard
-                        key={place.id + '-' + idx} // key 중복 방지
+                        key={place.id + '-' + idx}
                         ref={isLast ? lastItemRef : null}
                         onClick={() => navigate(`/place/${place.id}`)}
                     >
@@ -163,6 +157,16 @@ const PlaceListPage = () => {
             {loading && <div>로딩중...</div>}
         </List>
         <FixedMapButton onClick={() => navigate('/placemap')}>지도보기</FixedMapButton>
+        {showRegionSheet && (
+            <RegionSheet
+                selectedRegion={selectedRegion}
+                onSelect={(region) => {
+                    setSelectedRegion(region);
+                    setShowRegionSheet(false);
+                }}
+                onClose={() => setShowRegionSheet(false)}
+            />
+        )}
         </Container>
     );
 };
@@ -271,4 +275,85 @@ const LikeButton = styled.div`
     cursor: pointer;
     user-select: none;
     font-size: 14px;
+`;
+
+const regions = [
+    "전체", "서울", "경기", "인천", "부산", "제주", "울산", "경남", "대구", "경북",
+    "강원", "대전", "충남", "충북", "세종", "전남", "광주", "전북"
+];
+
+function RegionSheet({ selectedRegion, onSelect, onClose }) {
+    return (
+        <SheetOverlay>
+            <SheetContainer>
+                <SheetHeader>
+                    <SheetTitle>지역 설정</SheetTitle>
+                    <CloseBtn onClick={onClose}>×</CloseBtn>
+                </SheetHeader>
+                <RegionGrid>
+                    {regions.map(region => (
+                        <RegionBtn
+                            key={region}
+                            selected={selectedRegion === region}
+                            onClick={() => onSelect(region)}
+                        >
+                            {region}
+                        </RegionBtn>
+                    ))}
+                </RegionGrid>
+            </SheetContainer>
+        </SheetOverlay>
+    );
+}
+
+const SheetOverlay = styled.div`
+    position: fixed;
+    left: 0; top: 0; right: 0; bottom: 0;
+    background: rgba(44,44,44,0.3);
+    z-index: 2000;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+`;
+const SheetContainer = styled.div`
+    width: 100%;
+    max-width: 600px;
+    background: #fff;
+    border-radius: 24px 24px 0 0;
+    padding: 6px 16px 24px 16px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.08);
+`;
+const SheetHeader = styled.div`
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+`;
+const SheetTitle = styled.div`
+    font-size: 22px;
+    font-weight: bold;
+    text-align: center;
+    flex: 1;
+`;
+const CloseBtn = styled.button`
+    background: none;
+    border: none;
+    font-size: 28px;
+    color: #888;
+    cursor: pointer;
+`;
+const RegionGrid = styled.div`
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px 0;
+`;
+const RegionBtn = styled.button`
+    background: ${({ selected }) => (selected ? "#E6F0FB" : "none")};
+    color: ${({ selected }) => (selected ? "#176BCE" : "#222")};
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: ${({ selected }) => (selected ? "bold" : "normal")};
+    padding: 6px 0;
+    cursor: pointer;
 `;
