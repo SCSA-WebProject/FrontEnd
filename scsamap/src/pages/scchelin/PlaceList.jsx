@@ -20,8 +20,8 @@ const PlaceListPage = () => {
 
     const IMG_BASE_PATH = "http://localhost:8080/img";
 
-
-    const fetchPlaces = useCallback(async () => {
+    const fetchPlaces = useCallback(async (isRefresh = false) => {
+        setLoading(true);
         try {
             let orderBy = "id"; // 기본값: 최근 등록 순
             switch(selectedFilter) {
@@ -47,7 +47,7 @@ const PlaceListPage = () => {
                 withCredentials: true  // 쿠키를 포함하여 요청
             });
             const newBoards = res.data.boards || [];
-            setPlaces((prev) => [...prev, ...newBoards]);
+            setPlaces((prev) => isRefresh ? newBoards : [...prev, ...newBoards]);
             setHasMore(newBoards.length === 5);
             setLoading(false);
         } catch (e) {
@@ -56,10 +56,18 @@ const PlaceListPage = () => {
     }, [page, selectedFilter]);
 
     useEffect(() => {
-        setPlaces([]); // 필터 변경시 목록 초기화
-        setPage(1);    // 페이지 초기화
-        fetchPlaces();
+        setPage(1);
     }, [selectedFilter]);
+
+    useEffect(() => {
+        if (page === 1) {
+            setPlaces([]);
+            fetchPlaces(true); // 새로고침 플래그
+        } else {
+            fetchPlaces(false);
+        }
+        // eslint-disable-next-line
+    }, [page]);
 
     // IntersectionObserver 설정
     const lastItemRef = useCallback((node) => {
